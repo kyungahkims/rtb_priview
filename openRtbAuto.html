@@ -128,6 +128,8 @@
 	var itlTpCode = "{{ITL_TP_CODE}}";
 	function imgFail(pcode) {
 		$('.slide-ul').empty();
+		$('#app').attr('onclick', 'openOtjalnam()').css('cursor', 'pointer');
+		$('.shop_logo').hide();
 		if (frameheight <= 150 && framewidth < 500) {
             logoSize = 0;
             gridRow = 1; 
