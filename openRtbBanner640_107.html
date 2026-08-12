@@ -19,6 +19,7 @@
 </style>
 </head>
 <body>
+<div id="noHiddenMobon">
 <div id="mobon_type01">
 <div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
 <div id="sliderFrame">
@@ -27,6 +28,23 @@
 </div>
 </div>
 </div>
-</body>
+</div>
 {{wp_imgtag}}
+	<div class="mobonBanner" id="hiddenMobon" style="display:none;" onclick='window.open("https://mobon.net/bridge/")'>
+		<div id="mobonLogo" onclick='window.open("{{HTTP}}/ad/linfo.php")'></div>
+		<img src="{{HTTP}}/servlet/image/mobon/640x107.png" >
+	</div>
+	<img src='{{img}}' id="test" style='display: none;' onError="imgFail('');"/>
+</body>
+<script type="text/javascript">
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
 </html>

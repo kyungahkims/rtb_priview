@@ -19,5 +19,22 @@
 			<div id="mobon_banner" style="background-image:url('{{img}}');" onclick="window.open('{{purl}}')"></div>
 		</div>
 	</div>
- </body>
+	{{wp_imgtag}}
+	<div class="mobonBanner" id="hiddenMobon" style="display:none;" onclick='window.open("https://mobon.net/bridge/")'>
+		<div id="mobonLogo" onclick='window.open("{{HTTP}}/ad/linfo.php")'></div>
+		<img src="{{HTTP}}/servlet/image/mobon/720x1230.png" style='width:100%; height:auto;background-size:cover;'>
+	</div>
+	<img src='{{img}}' id="test" style='display: none;' onError="imgFail('');"/>
+</body>
+<script type="text/javascript">
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
 </html>

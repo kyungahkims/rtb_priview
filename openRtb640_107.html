@@ -39,6 +39,7 @@ ul, li {text-decoration: none;list-style: none;}
 .img_sub ul li.on_box:after {content: "";display: block;position: absolute;top: 0;left: 0;width: 90px;height: 87px;border: 2px solid #c73535;}
 </style>
 <body>
+<div id="noHiddenMobon">
 <div class="box">
 <div class="mobon_banner">
 <div class="lineBox">
@@ -80,6 +81,23 @@ onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
 </div>
 </div>
 </div>
+</div>
 {{wp_imgtag}}
+	<div class="mobonBanner" id="hiddenMobon" style="display:none;" onclick='window.open("https://mobon.net/bridge/")'>
+		<div id="mobonLogo" onclick='window.open("{{HTTP}}/ad/linfo.php")'></div>
+		<img src="{{HTTP}}/servlet/image/mobon/640x107.png" >
+	</div>
+	<img src='{{img1}}' id="test" style='display: none;' onError="imgFail('');"/>
 </body>
+<script type="text/javascript">
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
 </html>
