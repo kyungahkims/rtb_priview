@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<title>mobon guide</title>
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/common/css/mobon_reset.css?201706292">
+	<style type="text/css">
+		body{margin:0;padding:0;}
+		#mobon_type01{width:198px;height:198px;border:1px solid #ccc;position:relative;background:#fff;margin:0 auto;overflow:hidden;}
+		#mobon_type01 .main_img_box{width:100%;height:198px;position:relative;overflow:hidden;}
+		#mobon_type01 .main_img_box .item{top:0px;padding:0;margin:0;width:100%;height:100%;cursor:pointer;overflow:hidden;}
+		#mobon_type01 .main_img_box .item .img{width:100%;height:148px;background-size:cover;background-position:50% 50%;}
+		#mobon_type01 .saleBox{width:94%;height:26px;line-height:26px;font-size:12px;color:#000;padding: 24px 3% 0 3%;}		
+		#mobon_type01 .saleBox span {text-align:center}
+		#mobon_type01 .saleBox .product_name{width:52%;float:left;text-align:center;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;}
+		#mobon_type01 .textBox{width:94%;height:26px;line-height:26px;font-size:12px;color:#000;padding: 24px 3% 0 3%;}		
+		#mobon_type01 .textBox span {text-align:center}
+		#mobon_type01 .textBox .product_name{width:52%;float:left;text-align:center;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;}
+		.no_box, .sale_box{width:42%;text-align:left;font-size:12px;letter-spacing:-0.5px;}
+		.sale_box p{position:absolute;bottom:0;left:100px;}
+		.saleBox .sale_box .price{text-decoration:line-through;font-weight:500;}
+		.textBox .sale_box .price{font-weight:500;}
+		.sale_box .price2{color:#c02323;font-weight:600;opacity:0;filter:alpha(opacity=0);}
+		.shop_logo0 {position:absolute;bottom:26px;width:100%;height:20px;text-align:center;cursor: pointer;background-size:contain;background-repeat:no-repeat;background-position:center center;}
+	</style>
+</head>
+<body>
+	<div class="mobon_reset">
+		<div id="mobon_type01">
+			<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<ul class="main_img_box">
+				<li class="item" onclick="window.open('{{purl1}}')">
+					<div class="img" style="background-image:url('{{img1}}');{{ImageSqre}}"></div>
+					<div class="{{box1}}">
+						<span class="product_name">{{pnm1}}</span>
+						<div class="sale_box">
+							<p class="price2">{{price2_1}}</p>
+							<p class="price">{{price1}}</p>
+						</div>
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl2}}')">
+					<div class="img" style="background-image:url('{{img2}}');{{ImageSqre}}"></div>
+					<div class="{{box2}}">
+						<span class="product_name">{{pnm2}}</span>
+						<div class="sale_box">
+							<p class="price2">{{price2_2}}</p>
+							<p class="price">{{price2}}</p>
+						</div>
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl3}}')">
+					<div class="img" style="background-image:url('{{img3}}');{{ImageSqre}}"></div>
+					<div class="{{box3}}">
+						<span class="product_name">{{pnm3}}</span>
+						<div class="sale_box">
+							<p class="price2">{{price2_3}}</p>
+							<p class="price">{{price3}}</p>
+						</div>
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl4}}')">
+					<div class="img" style="background-image:url('{{img4}}');{{ImageSqre}}"></div>
+					<div class="{{box4}}">
+						<span class="product_name">{{pnm4}}</span>
+						<div class="sale_box">
+							<p class="price2">{{price2_4}}</p>
+							<p class="price">{{price4}}</p>
+						</div>
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl5}}')">
+					<div class="img" style="background-image:url('{{img5}}');{{ImageSqre}}"></div>
+					<div class="{{box5}}">
+						<span class="product_name">{{pnm5}}</span>
+						<div class="sale_box">
+							<p class="price2">{{price2_5}}</p>
+							<p class="price">{{price5}}</p>
+						</div>
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl6}}')">
+					<div class="img" style="background-image:url('{{img6}}');{{ImageSqre}}"></div>
+					<div class="{{box6}}">
+						<span class="product_name">{{pnm6}}</span>
+						<div class="sale_box">
+							<p class="price2">{{price2_6}}</p>
+							<p class="price">{{price6}}</p>
+						</div>
+					</div>
+				</li>
+			</ul>
+			<div class="shop_logo0" style='background-image:url("{{logo}}")'></div>
+		</div>
+	</div>
+	{{wp_imgtag}}
+	<div style="background: #f3f3f3; font-size: 0;display:none;" id="hiddenMobon">
+		<div id="mobon_banner" onclick="window.open('https://ref.ad-brix.com/v1/referrallink?ak=576324275&ck=1535237')">
+		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<img src="{{HTTP}}/servlet/image/otjalnam/200x200.jpg" />
+		</div>
+	</div>
+	<img src="{{img1}}" onError="imgFail('{{pcode1}}');" style='display: none;' />
+	<img src="{{img2}}" onError="imgFail('{{pcode2}}');" style='display: none;' />
+	<img src="{{img3}}" onError="imgFail('{{pcode3}}');" style='display: none;' />
+	<img src="{{img4}}" onError="imgFail('{{pcode4}}');" style='display: none;' />
+	<img src="{{img5}}" onError="imgFail('{{pcode5}}');" style='display: none;' />
+	<img src="{{img6}}" onError="imgFail('{{pcode6}}');" style='display: none;' />
+</body>
+<script type="text/javascript" src="{{HTTP}}/Frtb/common/script/jquery.js"></script>
+<script type="text/javascript" src="{{HTTP}}/rtb/common/script/jquery.bxslider.min.true.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		$(function() {
+			function loop(){
+				$('.price2').animate({opacity: "1"},500).animate({opacity: "1"},1000).animate({opacity: "0"},500).animate({opacity: "0"},2000,loop);
+				$('.price').animate({opacity: "0"},500).animate({opacity: "0"},1000).animate({opacity: "1"},500).animate({opacity: "1"},2000,loop);
+			}
+			loop();
+		});
+	});
+	
+	$('.main_img_box').bxSlider({
+		mode:'horizontal',
+		speed:500,
+        pause:4000,
+		pager:false,
+		slideWidth:198,
+		moveSlides:1,
+		minSlides:1,
+		maxSlides:1,
+		slideMargin:0,
+		auto:true,
+		autoHover:false,
+		controls:false
+	});
+	
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
+</html>

@@ -1,0 +1,44 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<title>mobon guide</title>
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/common/css/mobon_reset.css?201706292">
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/common/css/nr_type1.css?20180723">
+	<style type="text/css">
+		html,body,.mobon_reset{width:100%;height:100%;}
+		#mobonBox{position:relative;display:block;width:100%;height:100%;margin:0 auto;overflow:hidden;box-sizing:border-box;}
+		#mobonBox .banner_box{width:100%;height:100%;overflow:hidden;cursor:pointer;border:0;}
+		#mobonBox .banner_box > div{width:100%;height:100%;background-size: contain; background-position: center center;background-repeat: no-repeat;background-image: url({{img}});}
+	</style>
+</head>
+<body>
+	<div class="mobon_reset" id="noHiddenMobon">
+		<div id="mobonBox">
+			<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<div class="banner_box">
+				<div id="obj0_img" alt="" onclick="window.open('{{purl}}')"></div>
+			</div>
+		</div>
+	</div>
+	{{wp_imgtag}}
+	<div class="mobonBanner" id="hiddenMobon" style="display:none;" onclick='window.open("https://ref.ad-brix.com/v1/referrallink?ak=576324275&ck=1535237")'>
+		<div id="mobonLogo" onclick='window.open("{{HTTP}}/ad/linfo.php")'></div>
+		<img src="{{HTTP}}/servlet/image/otjalnam/320x50.jpg" >
+	</div>
+	<img src='{{img}}' id="test" style='display: none;' onError="imgFail('');"/>
+</body>
+<script type="text/javascript">
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<title>mobon guide</title>
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/common/css/mobon_reset.css?201706292">	
+	<style type="text/css">
+		body{margin:0;padding:0;}
+		#mobon_type01{width:198px;height:198px;border:1px solid #ccc;position:relative;background:#fff;margin:0 auto;overflow:hidden;}
+		#mobon_type01 .main_img_box{width:100%;height:198px;position:relative;overflow:hidden;}
+		#mobon_type01 .main_img_box .item{top:0px;padding:0;margin:0;width:100%;height:100%;cursor:pointer;overflow:hidden;}
+		#mobon_type01 .main_img_box .item .img{width:100%;height:128px;background-size:cover;background-position:50% 50%;background-repeat:no-repeat;}
+		#mobon_type01 .text_box{width:94%;height:36px;line-height:18px;font-size:12px;color:#000;padding: 26px 3% 0 3%;}
+		#mobon_type01 .text_box span {text-align:center}
+		#mobon_type01 .text_box .product_name{width:100%;float:left;text-align:center;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;}
+		.price{font-weight:600;width:100%;float:left;text-align:center;text-overflow: ellipsis;white-space: nowrap;overflow: hidden;text-align:center;}
+		.shop_logo0 {position:absolute;bottom:46px;width:100%;height:20px;text-align:center;cursor: pointer;background-size:contain;background-repeat:no-repeat;background-position:center center;}
+	</style>
+</head>
+<body>
+	<div class="mobon_reset">
+		<div id="mobon_type01">
+			<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<ul class="main_img_box">
+				<li class="item" onclick="window.open('{{purl1}}')">
+					<div class="img" style="background-image:url('{{img1}}');{{ImageSqre}}"></div>
+					<div class="text_box">
+						<span class="product_name">{{pnm1}}</span>
+						<span class="price">{{advrtsReplcNm}}&nbsp;{{price1}}</span >
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl2}}')">
+					<div class="img" style="background-image:url('{{img2}}');{{ImageSqre}}"></div>
+					<div class="text_box">
+						<span class="product_name">{{pnm2}}</span>
+						<span class="price">{{advrtsReplcNm}}&nbsp;{{price2}}</span >
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl3}}')">
+					<div class="img" style="background-image:url('{{img3}}');{{ImageSqre}}"></div>
+					<div class="text_box">
+						<span class="product_name">{{pnm3}}</span>
+						<span class="price">{{advrtsReplcNm}}&nbsp;{{price3}}</span >
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl4}}')">
+					<div class="img" style="background-image:url('{{img4}}');{{ImageSqre}}"></div>
+					<div class="text_box">
+						<span class="product_name">{{pnm4}}</span>
+						<span class="price">{{advrtsReplcNm}}&nbsp;{{price4}}</span >
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl5}}')">
+					<div class="img" style="background-image:url('{{img5}}');{{ImageSqre}}"></div>
+					<div class="text_box">
+						<span class="product_name">{{pnm5}}</span>
+						<span class="price">{{advrtsReplcNm}}&nbsp;{{price5}}</span >
+					</div>
+				</li>
+				<li class="item" onclick="window.open('{{purl6}}')">
+					<div class="img" style="background-image:url('{{img6}}');{{ImageSqre}}"></div>
+					<div class="text_box">
+						<span class="product_name">{{pnm6}}</span>
+						<span class="price">{{advrtsReplcNm}}&nbsp;{{price6}}</span >
+					</div>
+				</li>
+			</ul>
+			<div class="shop_logo0" style='background-image:url("{{logo}}")'></div>
+		</div>
+	</div>
+	{{wp_imgtag}}
+	<div style="background: #f3f3f3; font-size: 0;display:none;" id="hiddenMobon">
+		<div id="mobon_banner" onclick="window.open('https://ref.ad-brix.com/v1/referrallink?ak=576324275&ck=1535237')">
+		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<img src="{{HTTP}}/servlet/image/otjalnam/200x200.jpg" />
+		</div>
+	</div>
+	<img src="{{img1}}" onError="imgFail('{{pcode1}}');" style='display: none;' />
+	<img src="{{img2}}" onError="imgFail('{{pcode2}}');" style='display: none;' />
+	<img src="{{img3}}" onError="imgFail('{{pcode3}}');" style='display: none;' />
+	<img src="{{img4}}" onError="imgFail('{{pcode4}}');" style='display: none;' />
+	<img src="{{img5}}" onError="imgFail('{{pcode5}}');" style='display: none;' />
+	<img src="{{img6}}" onError="imgFail('{{pcode6}}');" style='display: none;' />
+</body>
+<script type="text/javascript" src="{{HTTP}}/Frtb/common/script/jquery.js"></script>
+<script type="text/javascript" src="{{HTTP}}/rtb/common/script/jquery.bxslider.min.true.js"></script>
+<script type="text/javascript">
+	$('.main_img_box').bxSlider({
+		mode:'horizontal',
+		speed:500,
+	       pause:4000,
+		pager:false,
+		slideWidth:198,
+		moveSlides:1,
+		minSlides:1,
+		maxSlides:1,
+		slideMargin:0,
+		auto:true,
+		autoHover:false,
+		controls:false
+	});
+	
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
+</html>

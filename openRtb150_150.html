@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+<title>daisy html</title>
+<link rel="stylesheet" type="text/css" href="{{HTTP}}/rtb/common/css/mobon_reset.css?201706292">
+<script type="text/javascript" src="{{HTTP}}/rtb/common/script/jquery.js"></script>
+<script type="text/javascript" src="{{HTTP}}/js/mobonStorage.js"></script>
+<script type="text/javascript" src="{{HTTP}}/newAd/common/webutil.js"></script>
+<script type="text/javascript" src="{{HTTP}}/newAd/js/jquery.bxslider.clone.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+Mainslider = $('.slider').bxSlider({
+mode:'vertical',
+auto: true,slideMargin:5,pause: 3000,pager:false,controls:false,autoHover:true,minSlides:1,maxSlides:1,moveSlides:1,
+onSlideAfter: function(){
+Mainslider.startAuto();
+}
+});
+});
+</script>
+<style type="text/css">
+body {margin: 0;padding: 0;}
+#mobon_type01 {width: 150px;height: 150px;position: relative;font-family: "돋움", dotum;box-sizing: border-box;margin: 0 auto;}
+#mobon_type01 .mobon_logo {width: 15px;height: 15px;position: absolute;right: 5px;top: 5px;z-index: 100;cursor: pointer;}
+#mobon_type01 .mobon_logo img {width: 100%;display: block;}
+#mobon_type01 .shop_logo {width: 100%;height: 27px;text-align: center;background: #fff;padding: 3px 0;cursor: pointer;font-size: 0;border-top: 1px solid #ccc;font-size: 0;}
+#mobon_type01 .shop_logo img {height: 100%;}
+#mobon_type01 .banner_box {cursor: pointer;background: #fff;font-size: 0;}
+#mobon_type01 .banner_box .box {width: 148px;height: 148px;overflow: hidden;font-size: 0;
+position: relative;background-size: cover;background-repeat: no-repeat;background-position: center center;}
+.text_Box {position: absolute;bottom: 0px;left: 0;width: 142px;height: 20px;line-height: 20px;background-color: rgba(0, 0, 0, 0.6);
+text-align: center;padding: 4px;text-overflow: ellipsis;overflow: hidden;color: #fff;}
+.product_name {font-size: 13px;overflow: hidden;display: inline-block;width: 142px;}
+.product_price {font-size: 15px;font-weight: bold;overflow: hidden;display: inline-block;width: 142px;}
+.slider {width: 150px}
+.slider li {width: 150px !important;height: 150px;margin-bottom: 0 !important;}
+.slider .box .item {overflow: hidden;width: 150px;height: 150px;}
+.ellipsis {overflow: hidden;text-overflow: ellipsis;white-space: nowrap;word-wrap: normal;}
+</style>
+</head>
+<body>
+<div class="mobon_reset">
+<div id="mobon_type01">
+<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+<div class="banner_box">
+<ul class="slider">
+<li>
+<div class="box obj0_img" style="background: url('{{img1}}'); background-size: cover; background-position: 50% 50%;" onclick="window.open('{{purl1}}')">
+<div class="text_Box"><span class="obj0_pnm product_name ellipsis">{{pnm1}}</span></div>
+</div>
+</li>
+<li>
+<div class="box obj1_img" style="background: url('{{img2}}'); background-size: cover; background-position: 50% 50%;" onclick="window.open('{{purl2}}')">
+<div class="text_Box"><span class="obj1_pnm product_name ellipsis">{{pnm2}}</span></div>
+</div>
+</li>
+<li>
+<div class="box obj2_img" style="background: url('{{img3}}'); background-size: cover; background-position: 50% 50%;" onclick="window.open('{{purl3}}')">
+<div class="text_Box"><span class="obj2_pnm product_name ellipsis">{{pnm3}}</span></div>
+</div>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</body>
+{{wp_imgtag}}
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+<title>daisy html</title>
+<link rel="stylesheet" type="text/css" href="{{HTTP}}/rtb/common/css/mobon_reset.css?20171122">
+<script type="text/javascript" src="{{HTTP}}/rtb/common/script/jquery.js"></script>
+<script type="text/javascript">
+$(window).load(
+function(){$(".goods_dsec").hide().eq(0).show();
+$(".img_sub>ul>li").hover(function() {var img_index = $(".img_sub>ul>li").index(this);
+$(".img_sub>ul>li").removeClass("on_box").eq(img_index).addClass("on_box");
+$(".goods_dsec").hide().eq(img_index).show();});});
+</script>
+<style type="text/css">
+* {margin: 0;padding: 0;border: 0;}
+ul, li {text-decoration: none;list-style: none;}
+.box {border: 1px solid #000;background: #fff;}
+.mobon_banner {width: 628px;height: 105px;position: relative;margin: 0 auto;overflow: hidden;}
+.mobon_banner:after {content: "";display: block;clear: both;}
+.lineBox {padding: 7px 0;}
+.lineBox:after {content: "";display: block;clear: both;}
+.img_box {width: 40%;height: 105px;overflow: hidden;float: left;}
+.img_box ul li {position: relative;}
+.img_box ul li img {width: 100%;}
+.mobon_logo {position: absolute;top: 0;left: 0;font-size: 0;z-index: 9999;cursor: pointer;width: 15px;height: 15px;}
+.mobon_logo img {width: 15px;height: 15px;border: 0;padding: 0;margin: 0;}
+.text_box {float: left;margin-left: 3px;width: 125px;background: #fff;text-align: center;height: 91px;}
+.shop_logo {padding: 3px;background: #fff;margin-top: 0;font-size: 0;}
+.shop_logo img {height: 30px;}
+.text_box dl {line-height: 120%;padding: 0 3px}
+.text_box dl dt {overflow: hidden;font-size: 11px;letter-spacing: -1px;color: #000;height: 28px;padding-bottom: 5px;vertical-align: middle;}
+.text_box dl dd {font-size: 16px;letter-spacing: -1px;color: #c73535;font-weight: bold;}
+.img_sub {float: right;width: 500px;}
+.img_sub ul {float: left;}
+.img_sub ul li {float: left;width: 94px;height: 91px;margin: 0 3px;overflow: hidden;cursor: pointer;position: relative;background: #fff;}
+.img_sub ul li.on_box:after {content: "";display: block;position: absolute;top: 0;left: 0;width: 90px;height: 87px;border: 2px solid #c73535;}
+</style>
+<body>
+<div class="box">
+<div class="mobon_banner">
+<div class="lineBox">
+<div id="mobonLogo"
+onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+<div class="text_box"><div class="shop_logo">
+<img src="{{logo}}" alt="logo" onerror="this.src='{{HTTP}}/rtb/images/mobon.jpg' ">
+</div>
+<dl class="goods_dsec" onclick="window.open('{{purl1}}')">
+<dt class="obj0_pnm">{{pnm1}}</dt>
+<dd class="obj0_price">{{price1}}</dd>
+</dl>
+<dl class="goods_dsec" onclick="window.open('{{purl2}}')">
+<dt class="obj1_pnm">{{pnm2}}</dt>
+<dd class="obj1_price">{{price2}}</dd>
+</dl>
+<dl class="goods_dsec" onclick="window.open('{{purl3}}')">
+<dt class="obj2_pnm">{{pnm3}}</dt>
+<dd class="obj2_price">{{price3}}</dd>
+</dl>
+<dl class="goods_dsec" onclick="window.open('{{purl4}}')">
+<dt class="obj3_pnm">{{pnm4}}</dt>
+<dd class="obj3_price">{{price4}}</dd>
+</dl>
+<dl class="goods_dsec" onclick="window.open('{{purl5}}')">
+<dt class="obj4_pnm">{{pnm5}}</dt>
+<dd class="obj4_price">{{price5}}</dd>
+</dl>
+</div>
+<div class="img_sub">
+<ul>
+<li class="on_box item_s click0" style="background: url('{{img1}}'); background-size: cover; background-position: 50% 50%;" onclick="window.open('{{purl1}}')"></li>
+<li class="item_s  click1" style="background: url('{{img2}}'); background-size: cover; background-position: 50% 50%;" onclick="window.open('{{purl2}}')"></li>
+<li class="item_s  click2" style="background: url('{{img3}}'); background-size: cover; background-position: 50% 50%;" onclick="window.open('{{purl3}}')"></li>
+<li class="item_s  click3" style="background: url('{{img4}}'); background-size: cover; background-position: 50% 50%;" onclick="window.open('{{purl4}}')"></li>
+<li class="item_s  click4" style="background: url('{{img5}}'); background-size: cover; background-position: 50% 50%;" onclick="window.open('{{purl5}}')"></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+{{wp_imgtag}}
+</body>
+</html>

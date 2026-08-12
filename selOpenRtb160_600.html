@@ -1,0 +1,83 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<title>mobon guide</title>
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/common/css/mobon_reset.css?201706292">
+	<style type="text/css">
+		.mobon_nate_box160{width:158px;height:598px;background:#f9f9f9;border:1px solid #ddd;position:relative;}
+		.mobon_nate_box160 .shop_logo{margin:15px 0 5px 0;height:30px;width:auto;overflow:hidden;cursor:pointer;}
+		.mobon_nate_box160 .shop_logo img{height:100%;margin:0 auto;display:block;}
+		.mobon_nate_box160 .align_center{width:150px;margin:0 auto;}
+		.mobon_nate_box160 .align_center dl{position:relative;border:2px solid #f9f9f9;width:146px;margin-bottom:4px;cursor:pointer;}
+		.mobon_nate_box160 .align_center dl dt{width:146px;height:133px;font-size:0;overflow:hidden;background-size:cover;background-position:center center;background-repeat:no-repeat;}
+		.mobon_nate_box160 .align_center dl dd{margin:0;font-size:12px;text-align:center;color:#fff;background-color:#888;width:98%;padding:0 1%;}
+		.mobon_nate_box160 .align_center dl dd p.pnm{width:100%;height:20px;line-height:20px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+		.mobon_nate_box160 .align_center dl dd .textBox,.mobon_nate_box160 .align_center dl dd .saleBox{font-size:11px;letter-spacing:-0.5px;height:18px;line-height:18px;}
+		.mobon_nate_box160 .align_center dl dd .saleBox .price{text-decoration:line-through;}
+		.mobon_nate_box160 .align_center dl dd .saleBox .price2{color:#ffff20;font-weight:600;}
+		.mobon_nate_box160 .align_center dl dd .textBox .price{color:#ffff20;font-weight:600;}
+	</style>
+</head>
+<body>
+	<div id="noHiddenMobon" class="mobon_nate_box160">
+		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+		<div class="shop_logo"><img src="{{logo}}" alt="logo" onERROR="this.src='{{HTTP}}/rtb/images/mobon.jpg'"></div>
+		<div class="align_center">
+			<dl id="click0_link" onclick="window.open('{{purl1}}');">
+				<dt style="background-image:url('{{img1}}');{{ImageSqre}}"></dt>
+				<dd>
+					<p class="pnm">{{pnm1}}</p>
+					<div class="{{box1}}">
+						<span class="price">{{price1}}</span>
+						<span class="price2">{{price2_1}}</span>
+					</div>
+				</dd>
+			</dl>
+			<dl id="click1_link" onclick="window.open('{{purl2}}');">
+				<dt style="background-image:url('{{img2}}');{{ImageSqre}}"></dt>
+				<dd>
+					<p class="pnm">{{pnm2}}</p>
+					<div class="{{box2}}">
+						<span class="price">{{price2}}</span>
+						<span class="price2">{{price2_2}}</span>
+					</div>
+				</dd>
+			</dl>
+			<dl id="click2_link" onclick="window.open('{{purl3}}');">
+				<dt style="background-image:url('{{img3}}');{{ImageSqre}}"></dt>
+				<dd>
+					<p class="pnm">{{pnm3}}</p>
+					<div class="{{box3}}">
+						<span class="price">{{price3}}</span>
+						<span class="price2">{{price2_3}}</span>
+					</div>
+				</dd>
+			</dl>
+		</div>
+	</div>
+	{{wp_imgtag}}
+	<div style="background: #f3f3f3; font-size: 0;display:none;" id="hiddenMobon">
+		<div id="mobon_banner" onclick="window.open('https://ref.ad-brix.com/v1/referrallink?ak=576324275&ck=1535237')">
+		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<img src="{{HTTP}}/servlet/image/otjalnam/160x600.jpg" />
+		</div>
+	</div>
+	<img src="{{img1}}" onError="imgFail('{{pcode1}}');" style='display: none;' />
+	<img src="{{img2}}" onError="imgFail('{{pcode2}}');" style='display: none;' />
+	<img src="{{img3}}" onError="imgFail('{{pcode3}}');" style='display: none;' />
+</body>
+<script type="text/javascript">
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
+</html>

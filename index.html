@@ -1,0 +1,1572 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>구글 RTB 배너 미리보기</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+  /* 프리텐다드 우선. PC 에 설치돼 있으면 그걸 쓰고, 없으면 위 CDN,
+     둘 다 안 되면 맑은 고딕으로 떨어진다. */
+  :root{
+    --font: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont,
+            "Malgun Gothic", "맑은 고딕", system-ui, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    font-family:var(--font);
+    font-size:13px;color:#1f2328;background:#f6f8fa;
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  /* 폼 요소는 font-family 를 상속하지 않으므로 명시 */
+  button,input,select,textarea{font-family:var(--font);}
+
+  /* ---------- header ---------- */
+  /* 좌우 12px 은 아래 .toolbar / .search / .group / .item 과 맞춘 공통 여백선이다 */
+  header{
+    flex:0 0 auto;display:flex;align-items:center;gap:12px;
+    padding:9px 12px;background:#24292f;color:#fff;
+  }
+  header h1{font-size:15px;margin:0;font-weight:600;letter-spacing:-.3px;}
+  header .sub{font-size:11px;color:#a0a8b0;}
+  header .spacer{flex:1;}
+  header button{
+    background:#373e47;color:#fff;border:1px solid #4a515a;border-radius:6px;
+    padding:5px 11px;cursor:pointer;font-size:12px;font-family:inherit;
+  }
+  header button:hover{background:#444c56;}
+  header button.on{background:#2da44e;border-color:#2da44e;}
+
+  /* 햄버거 버튼 — 막대 3개가 닫힘 상태에서 화살표 모양으로 살짝 접힌다.
+     정렬 기준은 버튼 상자가 아니라 '막대'다. 클릭 영역(26px)은 넉넉히 두고,
+     막대(16px)가 가운데 정렬되며 생기는 좌측 5px 만큼 버튼을 왼쪽으로 당겨
+     막대의 왼쪽 끝이 아래 목록·툴바와 같은 12px 선에 정확히 놓이게 한다. */
+  header button.ico{
+    display:flex;flex-direction:column;justify-content:center;align-items:center;gap:4px;
+    width:26px;height:26px;padding:0;border:0;flex:0 0 auto;
+    background:transparent;margin-left:-5px;border-radius:5px;
+  }
+  header button.ico:hover{background:#373e47;}
+  header button.ico span{
+    display:block;height:2px;width:16px;background:#c9d1d9;border-radius:2px;
+    transition:transform .18s ease, opacity .18s ease;
+  }
+  body.nav-closed header button.ico span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+  body.nav-closed header button.ico span:nth-child(2){opacity:0;}
+  body.nav-closed header button.ico span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+  /* ---------- layout ---------- */
+  main{flex:1;display:flex;min-height:0;}
+
+  /* ---------- sidebar ---------- */
+  aside{
+    flex:0 0 262px;background:#fff;border-right:1px solid #d8dee4;
+    display:flex;flex-direction:column;min-height:0;
+    overflow:hidden;transition:flex-basis .18s ease;
+  }
+  /* 닫으면 폭만 0 으로 줄인다. 내용을 지우지 않으므로 다시 열 때 스크롤 위치가 남는다. */
+  body.nav-closed aside{flex-basis:0;border-right-color:transparent;}
+  aside > *{min-width:261px;}      /* 접히는 동안 내용이 찌그러지지 않게 */
+  .search{padding:8px 12px;border-bottom:1px solid #eaeef2;}
+  .search input{
+    width:100%;padding:6px 9px;border:1px solid #d0d7de;border-radius:6px;
+    font-size:12px;font-family:inherit;outline:none;
+  }
+  .search input:focus{border-color:#0969da;box-shadow:0 0 0 2px #0969da22;}
+  .filelist{flex:1;overflow-y:auto;padding-bottom:20px;}
+  .group{
+    padding:10px 12px 5px;font-size:11.5px;font-weight:600;color:#424a53;
+    position:sticky;top:0;
+    background:#fff;border-bottom:1px solid #f0f2f4;
+  }
+  .group .en{font-weight:400;color:#8c959f;font-size:10.5px;}
+  /* 선택 표시용 왼쪽 3px 테두리가 글자를 밀어내므로, 그만큼 padding 을 줄여
+     항목명이 그룹라벨·검색창과 같은 12px 선에서 시작하게 한다 */
+  .item{
+    display:flex;align-items:center;gap:8px;padding:6px 12px 6px 9px;cursor:pointer;
+    border-left:3px solid transparent;line-height:1.35;
+  }
+  .item:hover{background:#f3f5f7;}
+  .item.active{background:#ddf4ff;border-left-color:#0969da;}
+  .item .nm{flex:1;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .item .sz{font-size:10px;color:#6e7781;font-variant-numeric:tabular-nums;}
+  .item.active .sz{color:#0969da;}
+  /* 등록 소재가 없는 비상품 배너 표시 */
+  .item .noad{
+    font-size:9.5px;color:#9a6700;background:#fff8c5;border:1px solid #eed888;
+    border-radius:10px;padding:0 5px;white-space:nowrap;
+  }
+  #adImgWrap.missing select{border-color:#d4a72c;background:#fff8c5;}
+
+  /* ---------- viewer ---------- */
+  section{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;}
+  .toolbar{
+    flex:0 0 auto;display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+    padding:7px 12px;background:#fff;border-bottom:1px solid #d8dee4;
+  }
+  .toolbar .title{font-weight:600;font-size:13px;}
+  .toolbar .dim{color:#57606a;font-size:11.5px;font-variant-numeric:tabular-nums;}
+  .toolbar .spacer{flex:1;}
+  .toolbar button,.toolbar select,.toolbar input[type=number]{
+    background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:4px 9px;
+    font-size:11.5px;cursor:pointer;font-family:inherit;color:#24292f;
+  }
+  .toolbar button:hover{background:#eef1f4;}
+  .toolbar input[type=number]{width:64px;cursor:text;}
+  .badge{
+    background:#fff3cd;color:#7a5b00;border:1px solid #f0d68a;border-radius:20px;
+    padding:2px 9px;font-size:11px;
+  }
+  /* ---------- 편집기 (오른쪽에서 밀려나오는 레이어) ---------- */
+  .workarea{flex:1;display:flex;min-height:0;min-width:0;position:relative;overflow:hidden;}
+  .editor{
+    position:absolute;top:0;right:0;bottom:0;width:var(--ed-w,48%);
+    display:flex;flex-direction:column;min-width:0;min-height:0;
+    background:#1e2227;color:#d5dae1;z-index:20;
+    box-shadow:-10px 0 28px rgba(0,0,0,.30);
+    transform:translateX(100%);visibility:hidden;
+    transition:transform .22s ease, visibility .22s;
+  }
+  .editor.open{transform:translateX(0);visibility:visible;}
+  /* 레이어가 덮은 만큼 미리보기 여백을 줘서, 편집하면서도 배너가 가려지지 않게 한다 */
+  .workarea.with-editor .stage{padding-right:calc(var(--ed-w,48%) + 26px);}
+  .ed-bar{
+    flex:0 0 auto;display:flex;align-items:center;gap:7px;padding:6px 8px 6px 12px;
+    background:#171a1f;border-bottom:1px solid #000;
+  }
+  .ed-bar .spacer{flex:1;}
+  .ed-file{font-size:12px;color:#c9d1d9;font-weight:600;}
+  .ed-dot{color:#e3b341;font-size:13px;visibility:hidden;}
+  .ed-dot.on{visibility:visible;}
+  .ed-bar button{
+    background:#2d333b;color:#cdd9e5;border:1px solid #444c56;border-radius:6px;
+    padding:4px 10px;font-size:11.5px;cursor:pointer;font-family:var(--font);
+  }
+  .ed-bar button:hover{background:#39404a;}
+  .ed-bar button.primary{background:#238636;border-color:#2ea043;color:#fff;}
+  .ed-bar button.primary:hover{background:#2ea043;}
+  .ed-bar kbd{
+    font-family:Consolas,monospace;font-size:9.5px;opacity:.7;
+    border:1px solid currentColor;border-radius:3px;padding:0 3px;margin-left:3px;
+  }
+
+  .ed-body{flex:1;display:flex;min-height:0;overflow:hidden;}
+  /* 줄번호 · 하이라이트 · 입력창 세 겹이 정확히 겹쳐야 하므로 글꼴 값을 공유한다 */
+  .ed-lines,.ed-hl,.ed-ta{
+    font-family:Consolas,"D2Coding",monospace;font-size:12.5px;line-height:19px;
+    tab-size:4;
+  }
+  .ed-lines{
+    flex:0 0 auto;padding:10px 8px 10px 12px;text-align:right;color:#5c6673;
+    background:#191d22;user-select:none;overflow:hidden;white-space:pre;
+  }
+  .ed-scroll{flex:1;position:relative;overflow:auto;min-width:0;}
+  /* 하이라이트 <pre> 와 입력 textarea 가 한 픽셀도 어긋나면 안 되므로
+     여백·글꼴을 완전히 같게 두고, 둘 다 스크롤 컨테이너의 내용으로서 함께 움직인다. */
+  .ed-hl,.ed-ta{
+    margin:0;padding:10px 14px;border:0;white-space:pre;overflow-wrap:normal;
+    box-sizing:border-box;
+  }
+  .ed-hl{position:absolute;top:0;left:0;min-width:100%;pointer-events:none;color:#adbac7;}
+  .ed-ta{
+    position:relative;display:block;min-width:100%;resize:none;outline:none;
+    background:transparent;color:transparent;caret-color:#79c0ff;overflow:hidden;
+  }
+  .ed-ta::selection{background:#3b5070;color:transparent;}
+  /* 문법 색상 */
+  .t-tag{color:#7ee787;} .t-attr{color:#79c0ff;} .t-str{color:#a5d6ff;}
+  .t-com{color:#6a7480;font-style:italic;} .t-pun{color:#8b949e;}
+  .t-var{color:#1e2227;background:#e3b341;border-radius:3px;font-weight:bold;}
+
+  .ed-status{
+    flex:0 0 auto;padding:5px 12px;background:#171a1f;border-top:1px solid #000;
+    font-size:11px;color:#8b949e;min-height:24px;
+  }
+  .ed-status.ok{color:#7ee787;} .ed-status.err{color:#ff7b72;}
+
+  /* 레이어 왼쪽 모서리를 잡아 너비 조절 */
+  .ed-split{
+    position:absolute;left:0;top:0;bottom:0;width:6px;cursor:col-resize;z-index:2;
+    background:transparent;transition:background .12s;
+  }
+  .ed-split:hover,.ed-split.dragging{background:#0969da;}
+
+  .stage{
+    flex:1;overflow:auto;padding:26px;
+    background:
+      linear-gradient(45deg,#e9edf1 25%,transparent 25%,transparent 75%,#e9edf1 75%),
+      linear-gradient(45deg,#e9edf1 25%,transparent 25%,transparent 75%,#e9edf1 75%);
+    background-size:18px 18px;background-position:0 0,9px 9px;background-color:#f6f8fa;
+    display:flex;justify-content:center;align-items:flex-start;
+  }
+  .frame-wrap{
+    background:#fff;box-shadow:0 1px 3px #0002,0 8px 26px #0000001a;
+    transform-origin:top center;
+  }
+  .stage iframe{display:block;border:0;background:#fff;}
+  .empty{
+    margin:auto;text-align:center;color:#6e7781;font-size:13px;line-height:1.9;
+  }
+  .empty b{display:block;font-size:15px;color:#24292f;margin-bottom:6px;}
+
+  /* ---------- settings ---------- */
+  .settings{
+    flex:0 0 auto;max-height:46vh;overflow-y:auto;display:none;
+    background:#fff;border-bottom:1px solid #d8dee4;padding:12px;
+  }
+  .settings.open{display:block;}
+  .settings h3{margin:0 0 8px;font-size:12px;color:#57606a;letter-spacing:.4px;text-transform:uppercase;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px 12px;}
+  .fld{display:flex;flex-direction:column;gap:3px;}
+  .fld label{font-size:11px;color:#57606a;font-weight:600;}
+  .fld input,.fld select,.fld textarea{
+    padding:5px 8px;border:1px solid #d0d7de;border-radius:6px;font-size:12px;
+    font-family:inherit;outline:none;background:#fff;
+  }
+  .fld input:focus,.fld textarea:focus,.fld select:focus{border-color:#0969da;}
+  .fld textarea{font-family:Consolas,monospace;font-size:11px;min-height:150px;resize:vertical;}
+  .catalog-bar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:8px;}
+  .catalog-bar button{
+    background:#f6f8fa;border:1px solid #d0d7de;border-radius:6px;padding:5px 11px;
+    cursor:pointer;font-size:12px;font-family:inherit;color:#24292f;
+  }
+  .catalog-bar button:hover{background:#eef1f4;}
+  .catalog-bar button.primary{background:#0969da;border-color:#0969da;color:#fff;}
+  .catalog-bar button.primary:hover{background:#0860c4;}
+  .catalog-bar button:disabled{opacity:.45;cursor:not-allowed;}
+  .catalog-bar .mini{font-size:11px;color:#57606a;display:flex;align-items:center;gap:4px;}
+  .catalog-bar select{
+    border:1px solid #d0d7de;border-radius:6px;padding:4px 6px;font-size:11.5px;font-family:inherit;
+  }
+  .src-tag{
+    font-size:11px;font-weight:400;text-transform:none;letter-spacing:0;
+    background:#eaeef2;color:#57606a;border-radius:20px;padding:2px 9px;margin-left:6px;
+  }
+  .src-tag.live{background:#dafbe1;color:#1a7f37;}
+  .settings .row{display:flex;gap:8px;margin-top:10px;align-items:center;}
+  .settings .row button{
+    background:#1f883d;color:#fff;border:0;border-radius:6px;padding:6px 14px;
+    cursor:pointer;font-size:12px;font-family:inherit;
+  }
+  .settings .row button.gray{background:#f6f8fa;color:#24292f;border:1px solid #d0d7de;}
+  .hint{font-size:11px;color:#6e7781;margin-top:6px;line-height:1.6;}
+
+  /* ---------- loader notice ---------- */
+  .notice{
+    display:none;background:#fff8c5;border-bottom:1px solid #eed888;
+    padding:10px 12px;font-size:12px;line-height:1.7;color:#4d3c00;
+  }
+  .notice.show{display:block;}
+  .notice code{background:#00000010;padding:1px 6px;border-radius:4px;font-family:Consolas,monospace;}
+  .notice button{
+    margin-left:6px;background:#fff;border:1px solid #d0b96a;border-radius:6px;
+    padding:3px 10px;cursor:pointer;font-size:11.5px;font-family:inherit;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <button id="btnNav" class="ico" title="파일 목록 열기/닫기 (Ctrl+B)" aria-label="파일 목록 토글">
+    <span></span><span></span><span></span>
+  </button>
+  <h1>구글 RTB 배너 미리보기</h1>
+  <span class="sub">원본 파일 수정 없이 <code style="color:#ffd479">{{변수}}</code>를 다바걸 실제 상품으로 치환해서 보여줍니다</span>
+  <span class="spacer"></span>
+  <button id="btnSettings">⚙ 변수 설정</button>
+  <button id="btnReload">↻ 다시 불러오기</button>
+</header>
+
+<div class="notice" id="notice"></div>
+
+<div class="settings" id="settings">
+  <h3>공통 변수</h3>
+  <div class="grid" id="commonFields"></div>
+
+  <h3 style="margin-top:14px">상품 데이터 <span id="catalogInfo" class="src-tag live"></span></h3>
+  <div class="catalog-bar">
+    <button id="btnUseCatalog" class="primary">🛍 다바걸 상품 적용</button>
+    <button id="btnShuffle">🔀 다른 상품 보기</button>
+    <button id="btnSample">샘플 이미지로</button>
+  </div>
+  <div class="fld">
+    <textarea id="productsJson" spellcheck="false"></textarea>
+  </div>
+  <div class="hint">
+    배열의 1번째 항목 → <code>{{img1}} {{pnm1}} {{price1}} {{price2_1}} {{purl1}} {{pcode1}}</code>, 2번째 → <code>…2</code> … 순으로 들어갑니다.
+    숫자가 없는 <code>{{img}} {{purl}}</code> 는 1번째 항목을 씁니다. <code>openRtbAuto.html</code> 의 <code>{{productList}}</code> 도 이 배열로 만들어집니다.
+  </div>
+
+  <div class="row">
+    <button id="btnApply">적용</button>
+    <button id="btnReset" class="gray">기본값으로 초기화</button>
+    <span class="hint" style="margin:0" id="saveMsg"></span>
+  </div>
+</div>
+
+<main>
+  <aside>
+    <div class="search"><input id="q" type="search" placeholder="파일명 / 사이즈 검색 (예: 300_250)" autocomplete="off"></div>
+    <div class="filelist" id="filelist"></div>
+  </aside>
+
+  <section>
+    <div class="toolbar">
+      <span class="title" id="curName">파일을 선택하세요</span>
+      <span class="dim" id="curSize"></span>
+      <span class="badge" id="unresolved" style="display:none"></span>
+      <span class="spacer"></span>
+      <label class="dim" id="adImgWrap" style="display:none">등록 소재
+        <select id="adSet"></select>
+        <select id="adImg"></select>
+      </label>
+      <label class="dim" style="cursor:pointer">W <input type="number" id="inW" min="10" max="4000" step="10"></label>
+      <label class="dim" style="cursor:pointer">H <input type="number" id="inH" min="10" max="4000" step="10"></label>
+      <select id="zoom">
+        <option value="fit">자동 맞춤</option>
+        <option value="1" selected>100%</option>
+        <option value="0.75">75%</option>
+        <option value="0.5">50%</option>
+        <option value="0.25">25%</option>
+        <option value="1.5">150%</option>
+        <option value="2">200%</option>
+      </select>
+      <button id="btnEdit">✎ 수정</button>
+      <button id="btnRefresh">↻ 새로고침</button>
+      <button id="btnNewTab">↗ 새 창</button>
+      <button id="btnDownload">⤓ 치환본 저장</button>
+    </div>
+
+    <div class="workarea" id="workarea">
+      <div class="stage" id="stage">
+        <div class="empty" id="empty">
+          <b>왼쪽 목록에서 배너를 선택하세요</b>
+          원본 HTML 은 그대로 두고, 브라우저에서 <code>{{HTTP}}</code> 같은 변수만 갈아끼워 미리보기 합니다.
+        </div>
+      </div>
+
+      <!-- 원본 편집기: 오른쪽에서 밀려나오는 레이어 -->
+      <div class="editor" id="editor">
+        <div class="ed-split" id="edSplit" title="드래그해서 너비 조절"></div>
+        <div class="ed-bar">
+          <span class="ed-file" id="edFile"></span>
+          <span class="ed-dot" id="edDirty" title="저장하지 않은 변경">●</span>
+          <span class="spacer"></span>
+          <button id="edRevert" title="디스크의 내용으로 되돌립니다">되돌리기</button>
+          <button id="edSave" class="primary">저장 <kbd>Ctrl+S</kbd></button>
+          <button id="edClose" title="편집기 닫기">✕</button>
+        </div>
+        <div class="ed-body">
+          <div class="ed-lines" id="edLines"></div>
+          <div class="ed-scroll" id="edScroll">
+            <pre class="ed-hl" id="edHL" aria-hidden="true"></pre>
+            <textarea class="ed-ta" id="edTA" spellcheck="false" wrap="off"
+                      autocapitalize="off" autocomplete="off"></textarea>
+          </div>
+        </div>
+        <div class="ed-status" id="edStatus"></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ==========================================================================
+   1. 미리보기 대상 파일 목록
+   ========================================================================== */
+const FILES = [
+  "openRtbCoupangAuto.html","openRtb120_600.html","openRtb150_150.html","openRtb160_600.html","openRtb200_200.html",
+  "openRtb250_250.html","openRtb300_250.html","openRtb300_250_with_light_effect.html",
+  "openRtb300_600.html","openRtb320_100.html","openRtb320_50.html","openRtb640_107.html",
+  "openRtb728_90.html","openRtb970_250.html","openRtbAuto.html",
+  "openRtbBanner1200_1200.html","openRtbBanner1200_628.html","openRtbBanner120_600.html",
+  "openRtbBanner150_150.html","openRtbBanner160_600.html","openRtbBanner200_200.html",
+  "openRtbBanner240_400.html","openRtbBanner250_250.html","openRtbBanner250_360.html",
+  "openRtbBanner300_1050.html","openRtbBanner300_250.html","openRtbBanner300_250_with_light_effect.html",
+  "openRtbBanner300_50.html","openRtbBanner300_600.html","openRtbBanner320_50.html",
+  "openRtbBanner580_400.html","openRtbBanner640_107.html","openRtbBanner728_90.html",
+  "openRtbBanner930_180.html","openRtbBanner970_250.html","openRtbBanner970_90.html",
+  "openRtbBanner980_120.html","openRtbBanner_instl_100_100.html",
+  "selOpenRtb120_600.html","selOpenRtb160_600.html","selOpenRtb200_200.html",
+  "selOpenRtb250_250.html","selOpenRtb300_250.html","selOpenRtb300_250_with_light_effect.html",
+  "selOpenRtb300_600.html","selOpenRtb320_100.html","selOpenRtb320_50.html",
+  "selOpenRtb728_90.html","selOpenRtb970_250.html"
+];
+
+/* 세 분류는 서로 겹치지 않도록 조건을 명시해 둔다 (순서를 바꿔도 안전) */
+const isBanner = n => /Banner/i.test(n);
+const isSel    = n => n.startsWith("selOpenRtb");
+
+const GROUPS = [
+  {key:"banner",  label:"비상품",    en:"openRtbBanner", test:isBanner},
+  {key:"openrtb", label:"상품",      en:"openRtb",       test:n=>!isBanner(n) && !isSel(n)},
+  {key:"sel",     label:"상품 세일", en:"selOpenRtb",    test:isSel}
+];
+
+/* 파일명에서 가로_세로 추출 (없으면 null) */
+function sizeOf(name){
+  const m = name.match(/(\d{2,4})_(\d{2,4})/);
+  return m ? {w:+m[1], h:+m[2]} : null;
+}
+
+/* ==========================================================================
+   2. 변수 기본값
+   ========================================================================== */
+const PALETTE = ["#5b8def","#f2724c","#3fb984","#9b6cf2","#f0a92c","#e05c8a",
+                 "#2fb6c4","#7a8a99","#c1554d","#4a86c8","#63a83e","#d1478f"];
+
+function sampleImg(i, w, h, label){
+  const c = PALETTE[(i-1) % PALETTE.length];
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">' +
+    '<rect width="100%" height="100%" fill="'+c+'"/>' +
+    '<text x="50%" y="50%" font-family="sans-serif" font-weight="bold" ' +
+    'font-size="'+Math.round(Math.min(w,h)/3.2)+'" fill="#ffffff" ' +
+    'text-anchor="middle" dominant-baseline="central">'+label+'</text></svg>';
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+/* "샘플 이미지로" 모드에서 쓰는 더미 로고 (3:1) */
+function sampleLogo(){
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="300" height="100">' +
+    '<rect width="100%" height="100%" fill="#ffffff"/>' +
+    '<text x="50%" y="52%" font-family="sans-serif" font-weight="bold" font-size="30" ' +
+    'fill="#8a94a0" text-anchor="middle" dominant-baseline="central">SHOP LOGO</text></svg>';
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+/* dabagirl.co.kr 실제 로고 (200x67 = 3:1, 배경 투명 PNG)
+   원본: https://manage.mobon.net/ad/imgfile//20240125140913-H2Gm0AL5jB-logo.png
+   배너 템플릿의 로고 슬롯이 90x30(3:1)이라 비율이 정확히 맞는다.
+   (openRtb970_250.html 의 .shop_logo0 에는 background-repeat 지정이 없어서
+    비율이 어긋나면 로고가 반복돼 보이는데, 3:1 이라 그 문제가 없다)
+   외부 요청 없이 뜨도록 data URI 로 내장한다. */
+const DABA_LOGO = "data:image/png;base64,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";
+
+function defaultProducts(){
+  const out = [];
+  for(let i=1;i<=12;i++){
+    out.push({
+      img   : sampleImg(i, 400, 400, String(i)),
+      pnm   : "샘플 상품명 " + i + " · 테스트용 텍스트",
+      price : (9900 + i*1000).toLocaleString() + "원",
+      price2: (7900 + i*1000).toLocaleString() + "원",
+      purl  : "https://www.mobon.net/",
+      pcode : 100000 + i,
+      dc    : 10 + i
+    });
+  }
+  return out;
+}
+
+/* --------------------------------------------------------------------------
+   dabagirl.co.kr 실제 상품 데이터 (수집일 2026-08-05, 154개)
+   [상품번호, 상품명, 정가, 할인가, 할인율, 이미지경로]
+   -------------------------------------------------------------------------- */
+const IMG_BASE = "https://cafe24img.poxo.com/dabainsang/web/product/";
+const CATALOG_DATE = "2026-08-05";
+const CATALOG_ROWS = [[88051,"[핫딜]웨트타이라인자켓슬랙스투피스","117,800원","106,100원",10,"small/202607/e623213db5bca94aa297685e252f0857.webp"],
+[88081,"[핫딜]비렌느린넨원피스","59,900원","53,900원",10,"small/202607/34d5572c55d7962dc09e3688c031d90e.jpg"],
+[88025,"미모배색트리밍자켓","46,800원","44,500원",5,"small/202607/228785c2d74d7238046842d7afaab05b.webp"],
+[87754,"[핫딜]더블릿카라원피스","69,900원","59,900원",14,"small/202605/4d1d0b5a8cb9825defe09be105af08cb.jpg"],
+[87972,"[핫딜]노버베스트블라우스슬랙스투피스","74,800원","67,400원",10,"small/202607/aa8ad2b571d71bdea25f33dc4aeb46e7.webp"],
+[88123,"[핫딜]프렛캡블라우스스커트투피스","74,800원","67,400원",10,"small/202607/587c0c1f483d9cbe2a9e89ef5a772fff.webp"],
+[88112,"[핫딜]래블트위드자켓","74,900원","64,900원",13,"small/202607/fccf02198253eafbdc417aa81b6b2163.webp"],
+[87787,"[핫딜]리콜배색스트슬랙스","56,900원","49,900원",12,"small/202605/957b8574033a12ae37384061c366ed1d.webp"],
+[85664,"[더 니트]리홀린넨버튼골지니트","29,900원","26,900원",10,"small/202602/3fdcbbd4b74847a14251b75e1d550ac6.webp"],
+[87175,"[더데님]이펙트부츠컷데님(한정수량)","39,800원","35,900원",10,"small/202606/e5d5c8b8844bb62fa162cbec12a60b48.gif"],
+[85576,"[더 니트]디엘타이니트","29,900원","24,900원",17,"small/202508/7c4a6ce94617b82c9550bbf1ed48f3b0.jpg"],
+[87374,"[더데님]보헴부츠컷팬츠","35,900원","29,900원",17,"small/202604/b345f74e46904ba9cb22f5fb38d07c21.webp"],
+[87669,"[더 니트]브릿카라버튼니트","29,900원","24,900원",17,"small/202606/ec791be8508a67b7cc3b8e94fafd3d98.gif"],
+[88169,"[더데님]데이빗와이드데님","39,900원","35,900원",10,"small/202608/38ababe8fcd566288dafe459bb16e6a1.webp"],
+[78721,"[더 니트]로토니골지니트","23,900원","23,900원",0,"small/202504/eaf4ae188af89149975d901765814d96.webp"],
+[85464,"[더데님]카오와이드데님","39,900원","35,900원",10,"small/202607/9dc386aac9dc6c46d1db7e375d89633d.jpg"],
+[88084,"벨링레이스카라니트","25,900원","25,900원",0,"small/202607/68e2184306b573d80a6efc3e6077913f.jpg"],
+[87717,"[핫딜]러튼카라베스트","54,900원","49,500원",10,"small/202605/3a15cbaf1ba73b9bb8a354028615c40b.webp"],
+[88055,"여리나시가디건세트","25,900원","24,700원",5,"small/202607/e05dfdffda9500a1ad7a70afcf57af15.webp"],
+[87962,"[핫딜]바넬스트랩린넨자켓팬츠투피스","79,800원","71,900원",10,"small/202606/d71c953370d3b0b641f4925711ddd54a.webp"],
+[87917,"포푸라운골지나시","18,000원","18,000원",0,"small/202606/d8fa20675c87b979918affce25e5228a.webp"],
+[87666,"[핫딜]메시아퍼프원피스","44,900원","39,900원",11,"small/202606/70ed983c56ab01896b799d5dd23eac1a.jpg"],
+[88115,"제브니시스루블라우스","39,900원","39,900원",0,"small/202607/2e444f120d46c31e85e9ff77da3dd483.jpg"],
+[87940,"[핫딜]쥬아르린넨타이자켓치마바지투피스","113,800원","99,900원",12,"small/202606/fec7a00574160e8a49713ff7828aa3d0.webp"],
+[87733,"뮤즈타이배색블라우스","40,900원","38,900원",5,"small/202605/c33d996150fd2f8f7d78af86c656d047.jpg"],
+[61636,"[핫딜]우니샤르세트","49,900원","44,900원",10,"small/202607/58f283da5ee933a0b979cd9d8648e273.jpg"],
+[70363,"[핫딜]리츠퍼프블라우스","29,900원","27,900원",7,"small/202507/35a6043a7568f8a909de7545869745ac.webp"],
+[87719,"[핫딜]러튼베스트슬랙스투피스","106,800원","96,200원",10,"small/202606/8219fa014fbbdda827b06425a8270456.webp"],
+[85135,"[핫딜]지엘퍼프블라우스스커트투피스","69,900원","59,900원",14,"small/202506/46798071477e56104250f870c7a39114.webp"],
+[78378,"[핫딜]샌디투턱슬랙스","37,900원","32,900원",13,"small/202505/8ca0710e904f5f18382e2b76caf5af9b.webp"],
+[87935,"포션츠브이랩투피스","56,600원","53,800원",5,"small/202606/8f1f95293498564c052d3350ac2243f8.jpg"],
+[84764,"셰버린반짝반팔티","19,900원","19,900원",0,"small/202504/978ecc5edaa7d7bc804ea823100d0a39.jpg"],
+[85450,"페이치빅포켓원피스","37,900원","37,900원",0,"small/202507/cd1885089e8762a4e689106c04f28edf.webp"],
+[87941,"[핫딜]로레나라인자켓","89,900원","79,900원",11,"small/202606/55f3331abcc2042f5065c06323f3f8ba.webp"],
+[81752,"[더 니트]레인보우니트나시[1+1]","25,900원","21,900원",15,"small/202506/f422a15f0993f20ce4f5c93dfa64bd61.jpg"],
+[87912,"[핫딜]비드에하프슬랙스","39,900원","34,900원",13,"small/202606/5473461dc86ea014976e3af0c04ccf8f.webp"],
+[87582,"딕프릴타이블라우스","37,900원","37,900원",0,"small/202604/8a91e6aa14e6669979ab9784420e9aae.jpg"],
+[85534,"[핫딜]바카골드조끼팬츠투피스","49,800원","44,900원",10,"small/202605/a5943dee5ea3afe61c2aa406f22931bc.webp"],
+[87489,"사쿠쉬폰진주블라우스","39,900원","39,900원",0,"small/202604/3758cd7fe5232566d332955d6281f27f.webp"],
+[85030,"[핫딜]케미린넨자켓스커트투피스(한정수량)","69,800원","49,900원",29,"small/202505/e5fb8fe87ae378993052cab1275e62c2.webp"],
+[84877,"[더 니트]센트초커니트","25,900원","21,900원",15,"small/202504/40bfc2268125eacb9114ef5fcb118a1c.webp"],
+[87581,"[핫딜]첼라스퀘어크롭자켓스커트투피스","91,800원","82,700원",10,"small/202606/82f420adea767ce1c9a1f8aee455cc29.webp"],
+[87379,"프린퍼프블라우스","41,000원","41,000원",0,"small/202603/c64075e3087cea3bd40dfd3590132097.webp"],
+[88138,"테즌배색니트원피스","48,800원","46,400원",5,"small/202607/9dfe32cb3fc0dd8097dde4dbe3cb96d3.webp"],
+[87553,"리즈스트라투피스","55,400원","52,700원",5,"small/202604/6dfde3083ad238182f2a5ba58f44b2fc.jpg"],
+[87868,"[핫딜]메릿퍼프트위드자켓스커트투피스","113,800원","99,900원",12,"small/202606/e94a18859e88ebbc812c146620f74de1.jpg"],
+[88179,"[핫딜]웨터핀턱슬랙스","48,900원","43,900원",10,"small/202608/e7b9e74385dfaa3110f552d837178f0e.webp"],
+[88175,"[핫딜]포키슬리브리스원피스","47,900원","42,900원",10,"small/202608/a216745622e99dc9bc43b1464085b2dd.webp"],
+[85108,"[더 니트]올뎃퍼프플레어니트","29,900원","24,900원",17,"small/202603/0390d6e03719257f911452437f552280.webp"],
+[85089,"[핫딜]핀데님블라우스팬츠투피스(한정수량)","49,900원","37,900원",24,"small/202605/51511db505454cd5eb96ed4728523e9c.jpg"],
+[87019,"[핫딜]래먼논페이드데님셔츠팬츠투피스","69,900원","59,900원",14,"small/202602/533109a1621e65a9cce0790f7d633dfd.webp"],
+[87922,"[핫딜]리베라자켓","56,900원","49,900원",12,"small/202606/b157d1233804ebdca0c374bc7032764f.webp"],
+[69384,"[핫딜]하벤느청원피스","34,900원","29,900원",14,"small/202505/c1e66099fd62c2e4e31d589e70ec0d02.jpg"],
+[75080,"[핫딜]템브밴딩스커트","23,900원","19,900원",17,"small/202508/7ccd4a895b9b43b2495cb240d134ab30.webp"],
+[87621,"[더 니트]콜슨배색카라니트","29,900원","25,900원",13,"small/202606/cdc6ba036c6203bec87036556e8672b4.webp"],
+[85104,"[핫딜]퍼렐타이라인자켓","71,900원","64,800원",10,"small/202506/3c97a282f97404e9deaa66ec2bf0c4f0.webp"],
+[87916,"[핫딜]앨라배색카라롱원피스","69,900원","59,900원",14,"small/202606/702f9d34e9f5d6df4aa478bfb68f47d8.webp"],
+[84997,"[핫딜]메텔라인반팔자켓","69,800원","62,900원",10,"small/202604/6ba9ee7637ac5e055f2a35db1722c841.webp"],
+[82308,"[핫딜]라비크투피스(한정수량)","69,800원","59,900원",14,"small/202604/e2a5264f0b62c6e9e408f52fc0d0a7aa.jpg"],
+[84881,"[핫딜]리블트위드자켓","64,900원","58,500원",10,"small/202504/1bcb7fb573fdd8f0b7661e59877a414d.webp"],
+[88153,"볼디진주로즈블라우스","37,900원","36,100원",5,"small/202607/29587c4530907cd6d1720d125deacded.webp"],
+[77284,"[핫딜]티메핀턱슬랙스","37,800원","32,800원",13,"small/202605/cb7a37c2d56ad78fef7a9fd6a0dfd54d.webp"],
+[85549,"[핫딜]프레시아훌원피스","45,900원","39,900원",13,"small/202604/66020ccfdbb9e0669308df57130fbd4a.webp"],
+[88183,"언즐캡골지티","27,900원","26,600원",5,"small/202608/17a0adb9b3beaa4e9639227c0dfab04a.jpg"],
+[88182,"어텀즈하프넥니트","16,000원","15,200원",5,"small/202608/25c9aa7707de6ce594412637ad6e3337.jpg"],
+[87741,"[핫딜]세드린린넨원피스(린넨30%)","59,900원","53,900원",10,"small/202605/92ad374bf333d70f59cc57d77019327d.jpg"],
+[88181,"비엔코골드펄가디건","42,900원","40,800원",5,"small/202608/bd2ebaccf16cb0001f8ba5d50dc2d833.jpg"],
+[88178,"씨엣쉬어퍼프원피스","31,900원","30,400원",5,"small/202608/61680cdad6962c8154afe06e1a522be1.jpg"],
+[88180,"브리사숄카라랩니트","22,000원","20,900원",5,"small/202608/a48167aa9b3eaac4ea770e1b8933d5f6.webp"],
+[88177,"바벨뷔스티팬츠투피스","46,800원","42,200원",10,"small/202608/4010fe39cf087a8c8c3a89f153835b6a.jpg"],
+[88176,"앤코드세미와이드팬츠(154)","39,900원","38,000원",5,"small/202608/b62d5ba7a5c0dc899232fb3722772da8.jpg"],
+[86977,"[핫딜]페럴드레더자켓","79,900원","69,900원",13,"small/202602/513b339d35f124eacd0e6f39d2870e80.webp"],
+[87966,"[핫딜]레먼캡슬리브블라우스","37,900원","32,900원",13,"small/202606/400f4fffc1acbb534f12b4cbc21cd4eb.webp"],
+[87953,"[핫딜]펄슨와이드슬랙스","45,900원","39,900원",13,"small/202606/65df7678b13ba06cf13a0bba16ac6ff3.gif"],
+[88162,"퍼블링버튼니트","33,900원","32,300원",5,"small/202607/8f6a2374a0b9fcf1408b191cd312616d.jpg"],
+[88127,"페어레이스블라우스","31,900원","31,900원",0,"small/202607/69da489fe72c4dc1ca0aeda916cf5340.jpg"],
+[88087,"쥬드핀턱맥시스커트","37,900원","37,900원",0,"small/202607/92cd98cb75658a5b754bc5621aee94ad.jpg"],
+[87604,"라티쉬폰프릴랩투피스","79,900원","76,000원",5,"small/202604/877c32aff95e49e3c4e5900364d00e45.webp"],
+[88071,"아넬퍼프배색원피스","48,800원","48,800원",0,"small/202607/a1996d6f1ee8c8d9312caf901f075ad3.webp"],
+[87789,"더즈캡스퀘어나시","16,000원","16,000원",0,"small/202605/463d283736f444ea4f37b007f4f2561c.jpg"],
+[60517,"[핫딜]멜리런블라우스","39,900원","36,000원",10,"small/202504/bb9e1a84c93eed6c262060cbdc1f61c9.jpg"],
+[88083,"쏠플로럴스모크원피스","35,900원","35,900원",0,"small/202607/a9765936b6ffcdb61a7bab208992a254.jpg"],
+[87494,"[핫딜]헤랑블라우스슬랙스투피스","78,600원","69,900원",11,"small/202606/96b05072cf1d9437a0c5055b2821d4c2.webp"],
+[65596,"[핫딜]사라린넨원피스","49,900원","44,900원",10,"small/202604/49a6235cbdbf8aeb983fd2deeb14a383.jpg"],
+[88126,"[핫딜]르더라인숏팬츠","32,900원","27,900원",15,"small/202607/b3c4ff39ac8c51cfb6276e84d293bc74.jpg"],
+[87398,"[핫딜]레아트위드자켓","69,800원","62,900원",10,"small/202604/9f93453e7e02a7a624c984f55e695826.webp"],
+[87883,"[핫딜]하델블라우스슬랙스투피스","69,800원","62,900원",10,"small/202606/8d9616c76e347670dec322f8fdb2c302.jpg"],
+[85200,"코넨부츠컷데님팬츠(5100)","27,300원","27,300원",0,"small/202506/9132ee16d29f707a380ce9f8302e0339.webp"],
+[82015,"[D&B]케버스트라이프셔츠","26,900원","25,600원",5,"small/202505/8818444401ca7a02c3cd9fffed50c8ca.jpg"],
+[88150,"발렌시와이드데님(5020)","25,900원","24,700원",5,"small/202607/09bec232d9d40f20de69cbf9093cd065.webp"],
+[69643,"오르인슬림셔츠","42,900원","42,900원",0,"small/202607/b981e875b70779fd254f19d9cca11b31.jpg"],
+[85400,"덴프부클나시숏팬츠투피스","42,000원","39,900원",5,"small/202507/8b46a1e3c4203fa9eae94ec8b908bcc2.jpg"],
+[84671,"올랑퍼프블라우스","31,900원","30,400원",5,"small/202504/46126de2463918fd37b4deb5d5f095c8.jpg"],
+[87550,"란제레이스가디건세트","39,000원","39,000원",0,"small/202604/0962f456412e353b6e5d0fdf95826691.webp"],
+[87583,"페일도트셔링블라우스","28,900원","28,900원",0,"small/202604/c5892b004dfecab210caeac03f45f224.jpg"],
+[85563,"세코빅카라자켓","56,600원","56,600원",0,"small/202508/9201d0f0e22699c84d93e2e70408a6f2.jpg"],
+[88078,"가든러플블라우스","37,900원","37,900원",0,"small/202607/c1d3a321a1ba943b562292776d6d11d1.jpg"],
+[88152,"[핫딜]앨디슬리브리스원피스","64,900원","55,900원",14,"small/202607/4fe27bd096ccf64b4116089076c1ee71.webp"],
+[88147,"페즐펄꽈배기가디건","37,900원","36,100원",5,"small/202607/3d7e3b038ab769bef59b92103ae3a97e.jpg"],
+[85414,"[핫딜]워브퍼프스트랩자켓","59,900원","53,900원",10,"small/202507/817fd0dbe6be96f025a5d2b989ef576a.webp"],
+[87907,"프런스팽글펀칭가디건","37,900원","36,100원",5,"small/202606/c0ebdf0e4513654b46ff1e0c6211b836.webp"],
+[88070,"오데트시어랩블라우스","52,700원","52,700원",0,"small/202607/410883b3b5a78f7e919cb5cf29f76773.jpg"],
+[85315,"[D&B]포르미프릴원피스","99,900원","99,900원",0,"small/202604/9d79888b288a6ae7d1b614d82cff23cf.jpg"],
+[85012,"[핫딜]리앤레이스원피스","59,900원","53,900원",10,"small/202605/bb8d96067f48395531f1f46e88ed4fe2.jpg"],
+[88173,"포엠보퍼프블라우스","33,900원","32,300원",5,"small/202608/e6c553fbf98748a3518a4bb265883ed3.webp"],
+[87705,"[핫딜]티니캡소매셔링원피스","59,900원","49,900원",17,"small/202607/b6cc621174dfae17cda13a29af9f1c86.webp"],
+[85351,"[핫딜]라티아크롭자켓스커트투피스","96,800원","87,200원",10,"small/202607/f711c1736adc7a84b5eb4187477f8cb3.jpg"],
+[68857,"쏘쿨하게입는나시","10,900원","10,900원",0,"small/202603/c0b88e25c6df7189937d761529b40387.webp"],
+[88073,"니제모달로고나시","20,000원","20,000원",0,"small/202607/cfb191edd7384ef2a023835c2c11b0bc.jpg"],
+[84942,"세리엔플라워원피스","39,900원","39,900원",0,"small/202505/a21766f488e2cc9913ba4cba7f9c5aa4.jpg"],
+[88004,"모네페이즐자수투피스","42,900원","40,800원",5,"small/202607/98c19d4d8e25fff2eee96107ed5f3003.webp"],
+[82431,"세련미트임원피스","39,900원","39,900원",0,"small/202505/993fd860b4426a123b334eaf78f600a0.webp"],
+[87893,"[핫딜]에디핀턱카브라팬츠","32,900원","27,900원",15,"small/202606/56998baff76125f67e3df7ddf90896e4.webp"],
+[85208,"비스켓골지롱원피스","37,900원","37,900원",0,"small/202606/fb57106421045db164aef2bfabf4c856.webp"],
+[84705,"[D&B]몬트골드치마바지","39,800원","39,800원",0,"small/202504/57db6eaeee3319bba81e6fffd47ab273.webp"],
+[87272,"홈커밍백자수가디건","28,000원","28,000원",0,"small/202603/19581e462ee7ed5307ada804fa6b0538.webp"],
+[70100,"미렛뜨개블라우스","20,000원","20,000원",0,"small/202606/aaf21be555a2113eb19bf7382555196e.jpg"],
+[87753,"꽈배기브이니트","18,000원","18,000원",0,"small/202605/30af0807b54c365d506180d431e36175.jpg"],
+[88171,"[D&B]리즌배색타이블라우스","39,900원","38,000원",5,"small/202608/8ade51dd7e57fb546876bc320b5d1681.jpg"],
+[87855,"델프슬릿카프리팬츠(1017)","24,000원","24,000원",0,"small/202606/81a0ade46c65414f488b84052d142ed9.jpg"],
+[87778,"콰이시스루백셔츠","33,900원","33,900원",0,"small/202605/9fc55f191244234f18c18914c3a7985a.jpg"],
+[88007,"페론시스루배색원피스","35,900원","35,900원",0,"small/202607/77ac528ec0ff8c0bb4a90be0313fb13b.jpg"],
+[78245,"[D&B]크레쉬투피스","69,900원","66,500원",5,"small/202604/3f824c9f4606617c7dafef9b5a79f595.webp"],
+[87990,"[더데님]에디트세미부츠컷데님","39,900원","35,900원",10,"small/202606/7f5782d249b507ac6674c621e2b6c1ee.webp"],
+[87970,"[D&B]노버베스트블라우스","34,900원","34,900원",0,"small/202606/76a95668dbe208d59542090ada45b5ae.jpg"],
+[87782,"모브와이드슬랙스","33,900원","33,900원",0,"small/202606/a249f2c58a0b71091caa179e5c3e81d6.jpg"],
+[82195,"에슬론프릴니트","18,000원","18,000원",0,"small/202606/05303c57b3bee4f410333715c248e30f.jpg"],
+[77856,"[핫딜]하벨슬랙스","37,900원","32,900원",13,"small/202604/f5cb9adec8e0c6f267e6235b0ca7ac89.jpg"],
+[88157,"웬즈리본골지가디건","24,000원","22,800원",5,"small/202607/7cd0f28b639e5a2e907c16dfea95b430.jpg"],
+[87892,"토드펀칭블라우스세트","33,900원","33,900원",0,"small/202606/dc335b1654b83201034edcef67eb7127.jpg"],
+[87772,"피츠펄웨이브니트","33,900원","33,900원",0,"small/202605/d81fd4b0a136c7dbe51950bf719d7c0e.jpg"],
+[81359,"[D&B]로모도투버튼자켓","62,800원","62,800원",0,"small/202502/59e53b3805550e7a7e0265a5c3878d45.jpg"],
+[87707,"헤프단가라반팔가디건","31,900원","31,900원",0,"small/202605/db16ea2f919470b64accb12d52a35e1b.gif"],
+[85020,"오드셔츠벨트롱원피스","33,900원","33,900원",0,"small/202505/ed28c0898d9477ebadad6e493602a9f2.jpg"],
+[87822,"[핫딜]뉴렌트위드원피스","69,900원","59,900원",14,"small/202606/0fddf16b01af7ec50957968116848092.gif"],
+[88109,"바르샤언발쉬폰스커트","29,900원","29,900원",0,"small/202607/3fb3366339facefda27fd965e3f86aeb.webp"],
+[82313,"[더 니트]유얼캡나시니트","23,900원","19,900원",17,"small/202505/9c0afe97ddf02ac9da98a1d9ee99689a.jpg"],
+[88165,"에블레이스블라우스","31,900원","30,400원",5,"small/202607/d869f6c1a5e20d4ffb41155089e23552.jpg"],
+[85497,"[핫딜]브샤플라워티스커트투피스","63,800원","57,500원",10,"small/202507/c9bd44440ea3a7d5b68e99ef055c7e5f.webp"],
+[87864,"섀도핀턱와이드팬츠","31,900원","31,900원",0,"small/202606/157f25ffa30b34dbc07e27be76a86b70.jpg"],
+[88043,"스퀘어스트랩힐(vv2924)","50,700원","50,700원",0,"small/202607/b52944cf6aac95330e5e384275424f8e.jpg"],
+[88080,"베이직스퀘어힐(R261)","48,800원","46,400원",5,"small/202607/ddb7231f2bdd890c0c8bfe7a691af7b9.jpg"],
+[87063,"버기스플랫슈즈(8002)","51,600원","51,600원",0,"small/202602/5adb175d432da15e83137a150fd724cb.jpg"],
+[87530,"가보시플랫샌들슈즈(2181)","62,400원","62,400원",0,"small/202604/2808caecc3facb63fd3fd06980e7d1d6.jpg"],
+[87658,"스퀘어오픈토웨지힐(6057)","52,700원","52,700원",0,"small/202604/b25a13fe40f3477fa7fec2be0673872b.webp"],
+[88008,"블링온브릿샌들슈(8101)","48,800원","48,800원",0,"small/202607/f4e202a7f9c67bbdace54668123de2e0.webp"],
+[88184,"와이드위빙토트백","35,900원","34,200원",5,"small/202608/ad38b261141784513456d250b940b149.webp"],
+[88174,"첼리펜핸드백","33,900원","32,300원",5,"small/202608/1d6895b529fc565699b205717d6e3092.jpg"],
+[87765,"데일리라운지백","29,900원","29,900원",0,"small/202605/61e34fb78b9b2887a72ffbeef3693c86.jpg"],
+[88131,"파르핸드백","27,900원","26,600원",5,"small/202607/19ecf508cb7f8192a7f330feec1ced1f.jpg"],
+[88158,"노트버클숄더백","25,900원","24,700원",5,"small/202607/63cf9d6aeb34ab9fe47976697f6bcf8c.jpg"],
+[88129,"카포숄더백","25,900원","24,700원",5,"small/202607/c7446da0f492580c1d1a23456bea6ae3.jpg"],
+[88020,"마린니트백","25,900원","25,900원",0,"small/202607/2bd7d1dd1e2bbe0de3955f6492de5b64.webp"],
+[88010,"피누스토트백","24,000원","24,000원",0,"small/202607/9222302e8a5b3b586f404953d90608cf.jpg"]];
+
+const CATALOG = CATALOG_ROWS.map(r=>({
+  pcode:r[0], pnm:r[1], price:r[2], price2:r[3], dc:r[4],
+  img: IMG_BASE + r[5],
+  purl:"https://www.dabagirl.co.kr/product/detail.html?product_no=" + r[0]
+}));
+
+/* 카탈로그에서 12개를 잘라 배너 변수용 상품 배열로 변환 */
+function productsFromCatalog(offset){
+  const out = [];
+  for(let i=0;i<12;i++){
+    const p = CATALOG[(offset + i) % CATALOG.length];
+    out.push({img:p.img, pnm:p.pnm, price:p.price, price2:p.price2,
+              purl:p.purl, pcode:p.pcode, dc:p.dc});
+  }
+  return out;
+}
+
+/* --------------------------------------------------------------------------
+   비상품(openRtbBanner) 배너용 이미지
+   광고주센터에 등록된 이미지만 사용한다. w/h 는 파일에 든 실제 픽셀 크기이며,
+   slot 은 광고주센터에서 부르는 규격명(실제 크기와 다를 수 있음 — 300x250 슬롯의
+   등록 이미지는 336x280 이다).
+   -------------------------------------------------------------------------- */
+const AD_BASE = "https://manage.mobon.net/ad/imgfile//";
+
+/* 등록 소재는 업로드 묶음(세트) 단위로 관리한다. 세트를 바꾸면 배너 전체가
+   그 세트의 소재로 갈아끼워지므로 소재별 비교가 쉽다. */
+const AD_SETS = [
+  {
+    id:"20250610", label:"소재 A (25-06-10)",
+    images:[
+      {slot:"300x250",   w:336,  h:280,  f:"20250610115636-50gaqg8nrv-300x250.jpg"},
+      {slot:"850x850",   w:850,  h:850,  f:"20250610115637-Dnr5fpLGi8-850x850.jpg"},
+      {slot:"300x150",   w:300,  h:150,  f:"20250610115636-zi8V4t5ogY-300x150.jpg"},
+      {slot:"300x180",   w:300,  h:180,  f:"20250610115636-SjGXfROCh3-300x180.jpg"},
+      {slot:"120x600",   w:120,  h:600,  f:"20250610115637-6yuLqUXtlM-120x600.jpg"},
+      {slot:"160x600",   w:160,  h:600,  f:"20250610115635-bAvksyFaVB-160x600.jpg"},
+      {slot:"720x1230",  w:720,  h:1230, f:"20250610115636-OCSm1coEXi-720x1230.jpg"},
+      {slot:"800x1500",  w:800,  h:1500, f:"20250610115636-mdtJihVvKq-800x1500.jpg"},
+      {slot:"320x100",   w:320,  h:100,  f:"20250610115636-9xGudJt5lI-320x100.jpg"},
+      {slot:"1456x180",  w:1456, h:180,  f:"20250610115637-MoPNMuIcKX-1456x180.jpg"},
+      {slot:"720x120",   w:720,  h:120,  f:"20250610115636-Er3c0lveiI-720x120.jpg"},
+      {slot:"970x250",   w:970,  h:250,  f:"20250610115637-8nDXuhUDdY-970x250.jpg"},
+      {slot:"250x250_3", w:250,  h:250,  f:"20250610115636-SK1rXJryGC-250x250_3.jpg"},
+      {slot:"250x250_4", w:250,  h:250,  f:"20250610115708-WEJzL5BC8G-250x250_4.jpg"},
+      {slot:"250x250_5", w:250,  h:250,  f:"20250610115805-UZcp5AwYPu-250x250_5.jpg"}
+    ]
+  },
+  {
+    id:"20250604", label:"소재 B (25-06-04)",
+    images:[
+      {slot:"250x250",   w:250,  h:250,  f:"20250604195859-p51PifC5HD-250x250.jpg"},
+      {slot:"300x250",   w:336,  h:280,  f:"20250604195900-XYK1hnkDXo-300x250.jpg"},
+      {slot:"850x850",   w:850,  h:850,  f:"20250604195901-xYZrjKu2kE-850x850.jpg"},
+      {slot:"300x150",   w:300,  h:150,  f:"20250604195900-eLUe8SkaI1-300x150.jpg"},
+      {slot:"300x180",   w:300,  h:180,  f:"20250604195900-isIMRLpUSg-300x180.jpg"},
+      {slot:"120x600",   w:120,  h:600,  f:"20250604195901-m6GcCbPrlD-120x600.jpg"},
+      {slot:"160x600",   w:160,  h:600,  f:"20250604195859-ycNqNsCjx1-160x600.jpg"},
+      {slot:"720x1230",  w:720,  h:1230, f:"20250604195900-DmiozRUxiA-720x1230.jpg"},
+      {slot:"800x1500",  w:800,  h:1500, f:"20250604195900-SXSRBQbqYC-800x1500.jpg"},
+      {slot:"320x100",   w:320,  h:100,  f:"20250604195900-zEI4wZiNs8-320x100.jpg"},
+      {slot:"1456x180",  w:1456, h:180,  f:"20250604195901-jY8jnygfoq-1456x180.jpg"},
+      {slot:"720x120",   w:720,  h:120,  f:"20250604195900-c6SFyFW73h-720x120.jpg"},
+      {slot:"970x250",   w:970,  h:250,  f:"20250604195901-yVrEy4bRdr-970x250.jpg"}
+    ]
+  }
+];
+AD_SETS.forEach(s=>s.images.forEach(a=>{
+  a.url  = AD_BASE + a.f;
+  a.setId = s.id;
+  /* 250x250_3 처럼 뒤에 붙는 번호는 같은 규격의 여러 소재를 뜻하므로 떼어낸다 */
+  a.spec = a.slot.split("_")[0];
+}));
+
+function adSet(){
+  return AD_SETS.find(s=>s.id === CONF.common.adSet) || AD_SETS[0];
+}
+
+/*
+ * 배너에 들어갈 등록 소재 고르기 (현재 세트 안에서).
+ *
+ *   1순위 규격이 정확히 같은 소재
+ *   2순위 가로세로 비율이 가장 가까운 소재
+ *         (300x600 배너에 800x1500 소재가 들어가는 것처럼, 규격이 딱 맞지
+ *          않아도 비율이 맞으면 그 소재가 나간다. 로그 비율로 비교해야
+ *          가로형·세로형 양쪽에서 공평하다)
+ *
+ * ※ 규격명과 파일의 실제 픽셀이 다를 수 있다. 300x250 규격의 등록 파일은
+ *   336x280 인데 광고주센터가 300x250 자리에 허용하는 크기이므로,
+ *   1순위 비교는 픽셀이 아니라 규격명(spec)으로 한다.
+ */
+function adImageFor(size, set){
+  const imgs = (set || adSet()).images;
+  if(!imgs.length) return {img:null, all:[], fit:"none"};
+
+  const spec  = size.w + "x" + size.h;
+  const exact = imgs.filter(a=>a.spec === spec);
+  if(exact.length) return {img:exact[0], all:exact, fit:"exact"};
+
+  const want = size.w / size.h;
+  let best = imgs[0], bestGap = Infinity;
+  for(const a of imgs){
+    const gap = Math.abs(Math.log((a.w / a.h) / want));
+    if(gap < bestGap){ bestGap = gap; best = a; }
+  }
+  return {img:best, all:[best], fit:"nearest", gap:bestGap};
+}
+
+const SAMPLE_PICK = "__sample";   // 드롭다운에서 "샘플 이미지"를 고른 상태
+
+/* 등록 소재가 없는 규격에 넣을 자리표시용 샘플 이미지 */
+function noAdSample(size){
+  const w = size.w, h = size.h;
+  const base = Math.max(10, Math.min(w, h));
+  const svg =
+    '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'">' +
+    '<rect width="100%" height="100%" fill="#eef0f3"/>' +
+    '<rect x="1" y="1" width="'+(w-2)+'" height="'+(h-2)+'" fill="none" ' +
+    'stroke="#b6bec7" stroke-width="2" stroke-dasharray="7 5"/>' +
+    '<text x="50%" y="42%" font-family="sans-serif" font-weight="bold" ' +
+    'font-size="'+Math.round(base/7)+'" fill="#7c8894" text-anchor="middle" ' +
+    'dominant-baseline="central">소재 미등록</text>' +
+    '<text x="50%" y="60%" font-family="sans-serif" ' +
+    'font-size="'+Math.round(base/9)+'" fill="#9aa4ae" text-anchor="middle" ' +
+    'dominant-baseline="central">'+w+' x '+h+'</text></svg>';
+  return "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+}
+
+const DEFAULT_COMMON = {
+  HTTP        : "https://img.mobon.net",
+  HTTP_DR     : "https://rtb.mobon.net",
+  UUID        : "preview-uuid-0000",
+  USER        : "previewUser",
+  ITL_TP_CODE : "01",
+  logo        : DABA_LOGO,
+  shopUrl     : "https://www.dabagirl.co.kr/",   // 비상품 배너 클릭 시 이동할 주소
+  adSet       : "20250610",                      // 비상품 배너에 쓸 등록 소재 세트
+  advrtsReplcNm : "최저가",
+  ImageSqre   : "",
+  boxClass    : "saleBox",
+  wp_imgtag   : "",
+  catalogOffset : 0,            // 카탈로그에서 몇 번째 상품부터 쓸지
+  w           : "",
+  h           : ""
+};
+
+const COMMON_META = [
+  ["HTTP",        "{{HTTP}} · 정적 리소스 도메인"],
+  ["HTTP_DR",     "{{HTTP_DR}} · 트래킹 도메인"],
+  ["logo",        "{{logo}} · 쇼핑몰 로고 이미지"],
+  ["shopUrl",     "{{purl}} · 비상품 배너 클릭 주소"],
+  ["advrtsReplcNm","{{advrtsReplcNm}} · 가격 대체문구"],
+  ["boxClass",    "{{box1~12}} · 가격영역 class (saleBox/textBox)"],
+  ["ImageSqre",   "{{ImageSqre}} · 이미지 추가 CSS"],
+  ["wp_imgtag",   "{{wp_imgtag}} · 노출 트래킹 태그"],
+  ["UUID",        "{{UUID}}"],
+  ["USER",        "{{USER}}"],
+  ["ITL_TP_CODE", "{{ITL_TP_CODE}}"]
+];
+
+/* ==========================================================================
+   3. 설정 로드/저장
+   ========================================================================== */
+/* 저장 키에 내장 데이터 버전을 넣어, 상품·로고를 새로 넣으면
+   예전에 저장해 둔 옛 데이터가 그대로 남지 않게 한다.
+   (내장 상품/로고를 교체할 때마다 DATA_VER 을 올릴 것) */
+const DATA_VER = CATALOG_DATE + ".2";
+const LS_KEY = "rtbPreview.settings." + DATA_VER;
+let CONF = loadConf();
+
+function loadConf(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){
+      const o = JSON.parse(raw);
+      return {common:Object.assign({}, DEFAULT_COMMON, o.common||{}),
+              products:(o.products && o.products.length) ? o.products : productsFromCatalog(0)};
+    }
+  }catch(e){ /* 손상된 설정은 무시하고 기본값 */ }
+  return {common:Object.assign({}, DEFAULT_COMMON), products:productsFromCatalog(0)};
+}
+function saveConf(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(CONF)); }catch(e){}
+}
+
+/* ==========================================================================
+   4. 변수 테이블 만들기 + 치환
+   ========================================================================== */
+function buildVars(size, name){
+  const c = CONF.common, ps = CONF.products, v = {};
+
+  Object.keys(DEFAULT_COMMON).forEach(k=>{ v[k] = c[k] !== undefined ? c[k] : ""; });
+  delete v.boxClass; delete v.catalogOffset; delete v.shopUrl; delete v.adSet;
+
+  v.w = String(size.w);
+  v.h = String(size.h);
+
+  ps.forEach((p, idx)=>{
+    const n = idx + 1;
+    v["img"+n]     = p.img;
+    v["pnm"+n]     = p.pnm;
+    v["price"+n]   = p.price;
+    v["price2_"+n] = p.price2;
+    v["purl"+n]    = p.purl;
+    v["pcode"+n]   = String(p.pcode);
+    v["box"+n]     = c.boxClass;
+  });
+
+  /* 번호 없는 형태 */
+  const first = ps[0] || {};
+  v.img = first.img; v.purl = first.purl; v.pnm = first.pnm;
+  v.price = first.price; v.pcode = String(first.pcode);
+
+  /* 비상품(openRtbBanner)은 상품 이미지가 아니라
+     광고주센터에 등록된 이미지를 쓴다. 쓰는 변수도 {{img}}/{{purl}} 뿐이다. */
+  if(name && isBanner(name)){
+    if(adPick === SAMPLE_PICK){
+      v.img = noAdSample(size);                        // 소재 없는 상태를 직접 확인할 때
+    }else{
+      const chosen = adPick
+        ? adSet().images.find(a=>a.slot === adPick)
+        : adImageFor(size).img;
+      v.img = chosen ? chosen.url : noAdSample(size);
+    }
+    v.purl = c.shopUrl || "https://www.dabagirl.co.kr/";
+  }
+
+  /* openRtbAuto.html 의 자바스크립트 배열 */
+  v.productList = ps.map(p=>JSON.stringify({
+      img:p.img, pnm:p.pnm,
+      price:String(p.price).replace(/[^0-9]/g,""),
+      prdt_prmct:"", dc_rate:String(p.dc||0),
+      purl:p.purl, pcode:Number(p.pcode)||0,
+      advrtsReplcCode:"01", advrtsReplcNm:c.advrtsReplcNm
+    })).join(",\n\t\t");
+
+  return v;
+}
+
+/* 원본 문자열의 {{...}} 만 치환. 정의되지 않은 변수는 빈 값 처리 후 보고 */
+function substitute(src, vars){
+  const missing = new Set();
+  const out = src.replace(/\{\{\s*([A-Za-z0-9_]+)\s*\}\}/g, (m, key)=>{
+    if(Object.prototype.hasOwnProperty.call(vars, key)) return vars[key];
+    missing.add(key);
+    return "";
+  });
+  return {html:out, missing:[...missing]};
+}
+
+/* ==========================================================================
+   5. 원본 파일 읽기 / 쓰기
+
+   읽기는 세 경로를 지원한다.
+     ① 폴더 핸들(File System Access API) — 유일하게 저장까지 되는 경로
+     ② 파일 선택(<input type=file>) — 읽기 전용 대비책
+     ③ fetch — http 서버로 열었을 때
+   ========================================================================== */
+const cache  = new Map();     // name -> 원본 텍스트
+const picked = new Map();     // name -> File (읽기 전용 대비책)
+let dirHandle = null;         // FileSystemDirectoryHandle (읽기+쓰기)
+
+const canUseFSA = typeof window.showDirectoryPicker === "function";
+const canWrite  = ()=>!!dirHandle;
+
+async function fileHandleOf(name, create){
+  if(!dirHandle) return null;
+  return dirHandle.getFileHandle(name, {create: !!create});
+}
+
+async function readFile(name){
+  if(cache.has(name)) return cache.get(name);
+
+  let text = null;
+  if(dirHandle){
+    const h = await fileHandleOf(name);
+    text = await (await h.getFile()).text();
+  }else if(picked.has(name)){
+    text = await picked.get(name).text();
+  }else{
+    const res = await fetch(name, {cache:"no-store"});
+    if(!res.ok) throw new Error(name + " (" + res.status + ")");
+    text = new TextDecoder("utf-8").decode(await res.arrayBuffer());
+  }
+  cache.set(name, text);
+  return text;
+}
+
+/* 실제 파일에 덮어쓴다. 폴더 핸들이 있어야만 가능하다. */
+async function writeFile(name, text){
+  if(!dirHandle) throw new Error("저장하려면 먼저 폴더를 열어야 합니다");
+  const h = await fileHandleOf(name);
+  const w = await h.createWritable();
+  await w.write(new Blob([text], {type:"text/html;charset=utf-8"}));
+  await w.close();
+  cache.set(name, text);
+}
+
+/* 폴더 열기 — 읽기와 쓰기 권한을 함께 받는다 (반드시 클릭 안에서 호출할 것) */
+async function openFolder(){
+  if(!canUseFSA) throw new Error("이 브라우저는 폴더 열기를 지원하지 않습니다 (Chrome / Edge 권장)");
+  const h = await window.showDirectoryPicker({mode:"readwrite", id:"rtbBannerDir"});
+  let perm = await h.queryPermission({mode:"readwrite"});
+  if(perm !== "granted") perm = await h.requestPermission({mode:"readwrite"});
+  if(perm !== "granted") throw new Error("쓰기 권한이 허용되지 않았습니다");
+  dirHandle = h;
+  picked.clear(); cache.clear();
+  document.getElementById("notice").classList.remove("show");
+  updateWriteState();
+  return h;
+}
+
+/* 파일 원본을 읽거나 저장할 수 없는 상태를 안내 */
+function showLocalNotice(){
+  const el = document.getElementById("notice");
+  el.classList.add("show");
+  el.innerHTML =
+    '<b>배너 원본을 읽으려면 이 폴더를 한 번 열어 주세요.</b> ' +
+    '<button id="btnPickDir">📂 폴더 열기 (수정 가능)</button>' +
+    (canUseFSA ? '<button id="btnPickFiles">📄 파일 선택 (읽기 전용)</button>' : '') +
+    '<input type="file" id="fileInput" accept=".html,.htm" multiple hidden>' +
+    '<input type="file" id="dirInput" webkitdirectory directory multiple hidden><br>' +
+    '브라우저는 <code>file://</code> 로 열린 페이지가 옆에 있는 파일을 마음대로 읽지 못하도록 막습니다. ' +
+    '<b>폴더 열기</b>로 이 폴더를 지정하면 배너 원본을 읽고, 편집기에서 고친 내용을 <b>실제 파일에 저장</b>할 수 있습니다.';
+
+  const useFiles = fileList=>{
+    picked.clear(); cache.clear();
+    [...fileList].forEach(f=>{
+      if(/\.html?$/i.test(f.name) && f.name !== "index.html") picked.set(f.name, f);
+    });
+    if(!picked.size) return;
+    el.classList.remove("show");
+    updateWriteState();
+    if(current) select(current);
+  };
+
+  const fileInput = el.querySelector("#fileInput");
+  const dirInput  = el.querySelector("#dirInput");
+  el.querySelector("#btnPickDir").onclick = async ()=>{
+    try{
+      await openFolder();
+      if(current) select(current);
+    }catch(err){
+      if(err && err.name === "AbortError") return;          // 사용자가 취소
+      if(!canUseFSA){ dirInput.click(); return; }           // 구형 브라우저 대비책
+      alert("폴더를 열지 못했습니다: " + (err.message || err));
+    }
+  };
+  const pf = el.querySelector("#btnPickFiles");
+  if(pf) pf.onclick = ()=>fileInput.click();
+  fileInput.onchange = ()=>useFiles(fileInput.files);
+  dirInput.onchange  = ()=>useFiles(dirInput.files);
+}
+
+/* ==========================================================================
+   6. 사이드바 렌더링
+   ========================================================================== */
+const listEl = document.getElementById("filelist");
+let current = null;
+
+function renderList(filter){
+  filter = (filter||"").trim().toLowerCase();
+  listEl.innerHTML = "";
+  const used = new Set();
+
+  GROUPS.forEach(g=>{
+    const names = FILES.filter(n=>!used.has(n) && g.test(n));
+    names.forEach(n=>used.add(n));
+    const shown = names.filter(n=>!filter || n.toLowerCase().includes(filter));
+    if(!shown.length) return;
+
+    const h = document.createElement("div");
+    h.className = "group";
+    h.innerHTML = '<span class="ko"></span> <span class="en"></span>';
+    h.querySelector(".ko").textContent = g.label + " " + shown.length;
+    h.querySelector(".en").textContent = g.en;
+    listEl.appendChild(h);
+
+    shown.forEach(n=>{
+      const s = sizeOf(n);
+      const d = document.createElement("div");
+      d.className = "item" + (n === current ? " active" : "");
+      d.dataset.name = n;
+      /* 비상품 배너 중 그 규격 소재가 없어 다른 규격으로 대체되는 것은 미리 표시 */
+      const sub = isBanner(n) && s && adImageFor(s).fit === "nearest";
+      d.innerHTML = '<span class="nm"></span>' +
+                    (sub ? '<span class="noad">대체</span>' : '') +
+                    '<span class="sz">' + (s ? s.w + "×" + s.h : "auto") + '</span>';
+      d.querySelector(".nm").textContent = n.replace(/\.html$/,"");
+      if(sub) d.title = (s.w+"x"+s.h) + " 규격 소재가 없어 비율이 가장 가까운 소재로 대체됩니다";
+      d.onclick = ()=>select(n);
+      listEl.appendChild(d);
+    });
+  });
+
+  if(!listEl.children.length){
+    listEl.innerHTML = '<div style="padding:20px;color:#6e7781;text-align:center">검색 결과 없음</div>';
+  }
+}
+
+/* ==========================================================================
+   7. 미리보기
+   ========================================================================== */
+const stage      = document.getElementById("stage");
+const inW        = document.getElementById("inW");
+const inH        = document.getElementById("inH");
+const zoomSel    = document.getElementById("zoom");
+const badge      = document.getElementById("unresolved");
+const adImgWrap  = document.getElementById("adImgWrap");
+const adImgSel   = document.getElementById("adImg");
+const adSetSel   = document.getElementById("adSet");
+let   lastHtml   = "";
+let   adPick     = null;      // 비상품 배너에서 사용자가 직접 고른 등록 이미지 (null = 자동)
+
+async function select(name){
+  /* 편집 중이던 파일을 두고 다른 배너로 넘어갈 때는 한 번 물어본다 */
+  if(editorOpen && edFileName && edFileName !== name && edTA.value !== edSaved){
+    if(!confirm(edFileName + " 에 저장하지 않은 변경이 있습니다.\n버리고 이동할까요?")){
+      return;
+    }
+  }
+  current = name;
+  adPick  = null;                                  // 배너를 바꾸면 자동 매칭으로 되돌린다
+  history.replaceState(null, "", "#" + name);      // 특정 배너 주소를 그대로 공유/북마크 가능
+  [...listEl.querySelectorAll(".item")].forEach(el=>
+    el.classList.toggle("active", el.dataset.name === name));
+
+  const s = sizeOf(name) || {w:300, h:250};
+  inW.value = s.w; inH.value = s.h;
+
+  document.getElementById("curName").textContent = name;
+  document.getElementById("curSize").textContent = s.w + " × " + s.h;
+
+  /* 편집기가 열려 있으면 새로 고른 배너의 원본을 그대로 이어서 연다 */
+  if(editorOpen && edFileName !== name){
+    await openEditor();
+    return;
+  }
+  await paint();
+}
+
+/* 비상품 배너일 때만 등록 소재 선택 드롭다운을 보여준다 */
+function renderAdImgPicker(size){
+  if(!current || !isBanner(current)){ adImgWrap.style.display = "none"; return; }
+  adImgWrap.style.display = "";
+
+  const set = adSet();
+  if(adSetSel.options.length !== AD_SETS.length){
+    adSetSel.innerHTML = "";
+    AD_SETS.forEach(s=>adSetSel.appendChild(new Option(s.label + " · " + s.images.length + "개", s.id)));
+  }
+  adSetSel.value = set.id;
+
+  const spec = size.w + "x" + size.h;
+  const auto = adImageFor(size, set);
+  const autoLabel =
+    auto.fit === "exact"   ? "자동 · " + spec + " 등록 소재" +
+                             (auto.all.length > 1 ? " (" + auto.all.length + "개 중 1번)" : "")
+  : auto.fit === "nearest" ? "자동 · " + auto.img.slot + " 대체 (" + spec + " 미등록)"
+  :                          "소재 없음 → 샘플 이미지";
+
+  adImgSel.innerHTML = "";
+  adImgSel.appendChild(new Option(autoLabel, ""));
+  set.images.forEach(a=>{
+    const mark = a.spec === spec ? "  · 규격 일치" : "";
+    adImgSel.appendChild(new Option(a.slot + "  (" + a.w + "×" + a.h + ")" + mark, a.slot));
+  });
+  adImgSel.appendChild(new Option("샘플 이미지 (소재 없는 상태)", SAMPLE_PICK));
+  adImgSel.value = adPick || "";
+
+  adImgWrap.classList.toggle("missing", !adPick && auto.fit !== "exact");
+  adImgWrap.title = auto.fit === "exact"
+    ? spec + " 규격으로 등록된 소재를 사용합니다"
+    : spec + " 규격은 이 세트에 등록된 소재가 없어, 비율이 가장 가까운 " +
+      auto.img.slot + " 소재를 대신 넣었습니다";
+}
+
+async function paint(){
+  if(!current) return;
+  let src;
+  /* 편집 중이면 디스크가 아니라 편집기 내용으로 미리보기 한다 */
+  if(editorOpen && edFileName === current){
+    src = edTA.value;
+  }else{
+    try{
+      src = await readFile(current);
+    }catch(err){
+      showLocalNotice();
+      stage.innerHTML = '<div class="empty"><b>원본 파일을 읽지 못했습니다</b>' +
+                        String(err.message || err) + '</div>';
+      return;
+    }
+  }
+
+  const size = {w:+inW.value || 300, h:+inH.value || 250};
+  document.getElementById("curSize").textContent = size.w + " × " + size.h;
+  renderAdImgPicker(size);
+
+  const {html, missing} = substitute(src, buildVars(size, current));
+  lastHtml = html;
+
+  if(missing.length){
+    badge.style.display = "";
+    badge.textContent = "미정의 변수 " + missing.length + "개: " + missing.join(", ");
+  }else{
+    badge.style.display = "none";
+  }
+
+  stage.innerHTML = "";
+  const wrap = document.createElement("div");
+  wrap.className = "frame-wrap";
+  const ifr = document.createElement("iframe");
+  ifr.width = size.w; ifr.height = size.h;
+  ifr.setAttribute("scrolling","no");
+  ifr.srcdoc = html;
+  wrap.appendChild(ifr);
+  stage.appendChild(wrap);
+  applyZoom(size);
+}
+
+function applyZoom(size){
+  const wrap = stage.querySelector(".frame-wrap");
+  if(!wrap) return;
+  let z = zoomSel.value;
+  if(z === "fit"){
+    /* 편집기가 열리면 stage 의 오른쪽 여백이 커지므로 실제 여백을 읽어서 계산한다 */
+    const cs = getComputedStyle(stage);
+    const availW = stage.clientWidth  - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    const availH = stage.clientHeight - parseFloat(cs.paddingTop)  - parseFloat(cs.paddingBottom);
+    z = Math.max(0.05, Math.min(1, availW / size.w, availH / size.h));
+  }
+  wrap.style.transform = "scale(" + z + ")";
+}
+
+/* ==========================================================================
+   7-2. 원본 편집기
+
+   textarea 는 투명하게 두고 바로 아래 <pre> 에 색을 입힌 같은 글을 깔아서
+   문법 강조를 흉내낸다. 두 겹이 어긋나지 않도록 글꼴·줄높이·여백을 CSS 에서
+   공유하고, 줄바꿈은 하지 않는다(white-space:pre).
+   ========================================================================== */
+const editorEl = document.getElementById("editor");
+const workarea = document.getElementById("workarea");
+const edTA     = document.getElementById("edTA");
+const edHL     = document.getElementById("edHL");
+const edLines  = document.getElementById("edLines");
+const edScroll = document.getElementById("edScroll");
+const edStatus = document.getElementById("edStatus");
+const edDirty  = document.getElementById("edDirty");
+const btnEdit  = document.getElementById("btnEdit");
+
+const ED_W_KEY = "rtbPreview.editorWidth";
+let edWidthPct = 48;
+
+function setEditorWidth(pct){
+  edWidthPct = pct;
+  workarea.style.setProperty("--ed-w", pct + "%");
+}
+try{
+  const saved = parseFloat(localStorage.getItem(ED_W_KEY));
+  if(saved >= 22 && saved <= 85) edWidthPct = saved;
+}catch(e){}
+setEditorWidth(edWidthPct);
+
+let editorOpen = false;
+let edFileName = null;
+let edSaved    = "";        // 마지막으로 디스크와 같았던 내용 (LF 기준)
+let edEOL      = "\r\n";    // 그 파일이 원래 쓰던 줄바꿈
+let edPaintT   = null;
+
+/* textarea 는 값을 읽을 때 CRLF 를 LF 로 바꿔 버린다. 배너 원본은 전부 CRLF 라서
+   그대로 저장하면 손대지 않은 줄까지 전부 바뀐다. 그래서 열 때 원래 줄바꿈을
+   기억해 두고, 저장할 때 되돌려 놓는다. */
+const toLF   = s=>s.replace(/\r\n/g, "\n");
+const toDisk = s=>edEOL === "\r\n" ? s.replace(/\n/g, "\r\n") : s;
+
+function loadIntoEditor(src){
+  edEOL      = /\r\n/.test(src) ? "\r\n" : "\n";
+  edSaved    = toLF(src);
+  edTA.value = edSaved;
+}
+
+const esc = s=>s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+/* 주석 · {{변수}} · 태그 세 가지만 구분한다. 이 파일들에서 눈으로 좇아야 하는 건
+   결국 태그 구조와 치환 변수라서, 그 둘만 확실히 보이면 충분하다. */
+/* HTML 주석 여는/닫는 표시를 소스에 그대로 적으면 이 <script> 블록의
+   파싱 상태가 바뀔 수 있어, 조각으로 나눠 붙여서 정규식을 만든다. */
+const CMT_OPEN  = "<" + "!--";
+const CMT_CLOSE = "--" + ">";
+const TOKEN_RE = new RegExp(
+  "(" + CMT_OPEN + "[\\s\\S]*?" + CMT_CLOSE + ")" +   // 주석
+  "|(\\{\\{\\s*[A-Za-z0-9_]+\\s*\\}\\})" +            // 치환 변수
+  "|(<\\/?[A-Za-z][^>]*>)",                           // 태그
+  "g");
+
+function highlight(code){
+  const TOKEN = new RegExp(TOKEN_RE.source, "g");
+  let out = "", last = 0, m;
+  while((m = TOKEN.exec(code))){
+    out += esc(code.slice(last, m.index));
+    if(m[1])      out += '<span class="t-com">' + esc(m[1]) + '</span>';
+    else if(m[2]) out += '<span class="t-var">' + esc(m[2]) + '</span>';
+    else          out += highlightTag(m[3]);
+    last = TOKEN.lastIndex;
+  }
+  return out + esc(code.slice(last)) + "\n";     // 끝줄 여유
+}
+
+function highlightTag(tag){
+  const INNER = /(\{\{\s*[A-Za-z0-9_]+\s*\}\})|("[^"]*"|'[^']*')|([A-Za-z_:][-A-Za-z0-9_:.]*)(?==)/g;
+  const nameEnd = (tag.match(/^<\/?[A-Za-z][-A-Za-z0-9]*/) || [""])[0].length;
+  let out = '<span class="t-tag">' + esc(tag.slice(0, nameEnd)) + '</span>';
+  const rest = tag.slice(nameEnd);
+  let last = 0, m;
+  while((m = INNER.exec(rest))){
+    out += esc(rest.slice(last, m.index));
+    if(m[1])      out += '<span class="t-var">'  + esc(m[1]) + '</span>';
+    else if(m[2]) out += '<span class="t-str">'  + esc(m[2]) + '</span>';
+    else          out += '<span class="t-attr">' + esc(m[3]) + '</span>';
+    last = INNER.lastIndex;
+  }
+  return out + '<span class="t-pun">' + esc(rest.slice(last)) + '</span>';
+}
+
+function edRefresh(){
+  const text = edTA.value;
+  edHL.innerHTML = highlight(text);
+
+  const n = text.split("\n").length;
+  let nums = "";
+  for(let i=1;i<=n;i++) nums += i + "\n";
+  edLines.textContent = nums;
+
+  /* textarea 는 스스로 늘어나지 않으므로 하이라이트 층 크기에 맞춰 준다.
+     그래야 스크롤이 컨테이너 하나에서만 일어나 두 층이 어긋나지 않는다. */
+  edTA.style.height = edHL.scrollHeight + "px";
+  edTA.style.width  = Math.max(edScroll.clientWidth, edHL.scrollWidth) + "px";
+
+  edDirty.classList.toggle("on", text !== edSaved);
+  edSyncScroll();
+}
+
+/* 줄번호 칸은 스크롤 컨테이너 밖에 있으므로 세로 위치만 따라가게 한다 */
+function edSyncScroll(){
+  edLines.style.transform = "translateY(" + (-edScroll.scrollTop) + "px)";
+}
+
+function edSay(msg, kind){
+  edStatus.className = "ed-status" + (kind ? " " + kind : "");
+  edStatus.textContent = msg;
+}
+
+async function openEditor(){
+  if(!current) return;
+  let src;
+  try{ src = await readFile(current); }
+  catch(err){ showLocalNotice(); return; }
+
+  edFileName = current;
+  loadIntoEditor(src);
+  editorOpen = true;
+  editorEl.classList.add("open");
+  workarea.classList.add("with-editor");
+  btnEdit.classList.add("on");
+  document.getElementById("edFile").textContent = current;
+  edRefresh();
+  edSay(canWrite()
+    ? "Ctrl+S 로 실제 파일에 저장합니다"
+    : "저장하려면 상단에서 폴더를 열어야 합니다 (지금은 읽기 전용)",
+    canWrite() ? "" : "err");
+  applyZoom({w:+inW.value||300, h:+inH.value||250});
+}
+
+function closeEditor(){
+  if(editorOpen && edTA.value !== edSaved &&
+     !confirm("저장하지 않은 변경이 있습니다. 닫을까요?")) return;
+  editorOpen = false;
+  editorEl.classList.remove("open");
+  workarea.classList.remove("with-editor");
+  btnEdit.classList.remove("on");
+  edFileName = null;
+  paint();
+  setTimeout(()=>applyZoom({w:+inW.value||300, h:+inH.value||250}), 240);
+}
+
+async function saveEditor(){
+  if(!editorOpen || !edFileName) return;
+  if(!canWrite()){
+    edSay("저장하려면 폴더를 열어야 합니다. 상단 안내의 [폴더 열기] 를 눌러 주세요.", "err");
+    showLocalNotice();
+    return;
+  }
+  try{
+    await writeFile(edFileName, toDisk(edTA.value));   // 원래 줄바꿈으로 되돌려 기록
+    edSaved = edTA.value;
+    edRefresh();
+    const t = new Date();
+    edSay("저장됨 · " + edFileName + " · " + t.toLocaleTimeString("ko-KR") +
+          " · 줄바꿈 " + (edEOL === "\r\n" ? "CRLF" : "LF") + " 유지", "ok");
+  }catch(err){
+    edSay("저장 실패: " + (err.message || err), "err");
+  }
+}
+
+btnEdit.onclick  = ()=>{ editorOpen ? closeEditor() : openEditor(); };
+document.getElementById("edClose").onclick = closeEditor;
+document.getElementById("edSave").onclick  = saveEditor;
+document.getElementById("edRevert").onclick = async ()=>{
+  if(!edFileName) return;
+  if(edTA.value !== edSaved && !confirm("편집 내용을 버리고 디스크의 내용으로 되돌릴까요?")) return;
+  cache.delete(edFileName);
+  loadIntoEditor(await readFile(edFileName));
+  edRefresh(); paint();
+  edSay("디스크 내용으로 되돌렸습니다");
+};
+
+edTA.addEventListener("input", ()=>{
+  edRefresh();
+  clearTimeout(edPaintT);
+  edPaintT = setTimeout(paint, 300);        // 타이핑이 멎으면 미리보기 갱신
+});
+edScroll.addEventListener("scroll", edSyncScroll);
+
+/* Tab 은 포커스 이동 대신 들여쓰기로 */
+edTA.addEventListener("keydown", e=>{
+  if(e.key === "Tab"){
+    e.preventDefault();
+    const s = edTA.selectionStart, t = edTA.selectionEnd;
+    edTA.value = edTA.value.slice(0,s) + "\t" + edTA.value.slice(t);
+    edTA.selectionStart = edTA.selectionEnd = s + 1;
+    edRefresh();
+  }else if((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s"){
+    e.preventDefault();
+    saveEditor();
+  }
+});
+
+window.addEventListener("keydown", e=>{
+  if(!(e.ctrlKey || e.metaKey)) return;
+  const k = e.key.toLowerCase();
+  if(k === "s" && editorOpen){ e.preventDefault(); saveEditor(); }
+  else if(k === "b"){         // VS Code 와 같은 단축키로 목록을 접는다
+    e.preventDefault();
+    setNav(!document.body.classList.contains("nav-closed"), true);
+  }
+});
+window.addEventListener("beforeunload", e=>{
+  if(editorOpen && edTA.value !== edSaved){ e.preventDefault(); e.returnValue = ""; }
+});
+
+/* 레이어 왼쪽 모서리를 끌어 너비 조절.
+   오른쪽에 붙어 있으므로 왼쪽으로 끌수록 넓어진다. */
+(function(){
+  const split = document.getElementById("edSplit");
+  let dragging = false;
+  split.addEventListener("mousedown", e=>{
+    dragging = true; split.classList.add("dragging");
+    document.body.style.cursor = "col-resize"; e.preventDefault();
+  });
+  window.addEventListener("mousemove", e=>{
+    if(!dragging) return;
+    const box = workarea.getBoundingClientRect();
+    const pct = ((box.right - e.clientX) / box.width) * 100;
+    setEditorWidth(Math.max(22, Math.min(85, pct)));
+  });
+  window.addEventListener("mouseup", ()=>{
+    if(!dragging) return;
+    dragging = false; split.classList.remove("dragging");
+    document.body.style.cursor = "";
+    try{ localStorage.setItem(ED_W_KEY, edWidthPct); }catch(e){}
+    applyZoom({w:+inW.value||300, h:+inH.value||250});
+  });
+})();
+
+/* 저장 가능 여부에 따라 버튼 상태를 맞춘다 */
+function updateWriteState(){
+  const ok = canWrite();
+  btnEdit.title = ok
+    ? "원본 HTML 을 편집하고 실제 파일에 저장합니다"
+    : "편집은 되지만 저장하려면 폴더를 열어야 합니다";
+  if(editorOpen) edSay(ok ? "Ctrl+S 로 실제 파일에 저장합니다"
+                         : "저장하려면 폴더를 열어야 합니다 (지금은 읽기 전용)",
+                       ok ? "" : "err");
+}
+
+/* ==========================================================================
+   8. 설정 패널
+   ========================================================================== */
+const settingsEl = document.getElementById("settings");
+const commonEl   = document.getElementById("commonFields");
+const prodEl     = document.getElementById("productsJson");
+
+const catalogInfo = document.getElementById("catalogInfo");
+
+function renderCatalogInfo(){
+  catalogInfo.textContent =
+    "dabagirl.co.kr 상품 " + CATALOG.length + "개 · " + CATALOG_DATE + " 기준";
+}
+
+/* 카탈로그 → 상품 12개 적용 */
+function applyCatalog(offset){
+  CONF.common.catalogOffset = ((offset % CATALOG.length) + CATALOG.length) % CATALOG.length;
+  CONF.products = productsFromCatalog(CONF.common.catalogOffset);
+  CONF.common.logo = DABA_LOGO;
+  saveConf();
+  renderSettings();
+  paint();
+}
+
+function renderSettings(){
+  commonEl.innerHTML = "";
+  COMMON_META.forEach(([key, label])=>{
+    const d = document.createElement("div");
+    d.className = "fld";
+    d.innerHTML = '<label></label><input type="text" data-key="' + key + '">';
+    d.querySelector("label").textContent = label;
+    d.querySelector("input").value = CONF.common[key] ?? "";
+    commonEl.appendChild(d);
+  });
+  prodEl.value = JSON.stringify(CONF.products, null, 2);
+}
+
+document.getElementById("btnSettings").onclick = e=>{
+  settingsEl.classList.toggle("open");
+  e.currentTarget.classList.toggle("on", settingsEl.classList.contains("open"));
+};
+
+document.getElementById("btnApply").onclick = ()=>{
+  commonEl.querySelectorAll("input[data-key]").forEach(i=>{
+    CONF.common[i.dataset.key] = i.value;
+  });
+  const msg = document.getElementById("saveMsg");
+  try{
+    const arr = JSON.parse(prodEl.value);
+    if(!Array.isArray(arr) || !arr.length) throw new Error("배열이어야 합니다");
+    CONF.products = arr;
+    msg.textContent = "적용되었습니다";
+    msg.style.color = "#1a7f37";
+  }catch(err){
+    msg.textContent = "상품 JSON 오류: " + err.message + " (공통 변수만 적용됨)";
+    msg.style.color = "#cf222e";
+  }
+  saveConf();
+  paint();
+  setTimeout(()=>{ msg.textContent = ""; }, 4000);
+};
+
+document.getElementById("btnReset").onclick = ()=>{
+  CONF = {common:Object.assign({}, DEFAULT_COMMON), products:productsFromCatalog(0)};
+  saveConf();
+  renderSettings();
+  paint();
+};
+
+/* ---- 다바걸 카탈로그 버튼 ---- */
+document.getElementById("btnUseCatalog").onclick = ()=>
+  applyCatalog(CONF.common.catalogOffset || 0);
+
+document.getElementById("btnShuffle").onclick = ()=>
+  applyCatalog(Math.floor(Math.random() * CATALOG.length));
+
+document.getElementById("btnSample").onclick = ()=>{
+  CONF.products = defaultProducts();
+  CONF.common.logo = sampleLogo();
+  saveConf();
+  renderSettings();
+  paint();
+};
+
+/* ==========================================================================
+   9. 툴바 동작
+   ========================================================================== */
+document.getElementById("q").oninput = e=>renderList(e.target.value);
+document.getElementById("btnRefresh").onclick = ()=>{ cache.delete(current); paint(); };
+document.getElementById("btnReload").onclick  = ()=>{ cache.clear(); paint(); };
+inW.onchange = inH.onchange = ()=>paint();
+adImgSel.onchange = ()=>{ adPick = adImgSel.value || null; paint(); };
+adSetSel.onchange = ()=>{                 // 세트를 바꾸면 개별 선택은 자동으로 되돌린다
+  CONF.common.adSet = adSetSel.value;
+  adPick = null;
+  saveConf();
+  renderList(document.getElementById("q").value);   // 세트별 미등록 표시 갱신
+  paint();
+};
+zoomSel.onchange = ()=>applyZoom({w:+inW.value||300, h:+inH.value||250});
+window.addEventListener("resize", ()=>{
+  if(zoomSel.value === "fit") applyZoom({w:+inW.value||300, h:+inH.value||250});
+});
+
+document.getElementById("btnNewTab").onclick = ()=>{
+  if(!lastHtml) return;
+  const url = URL.createObjectURL(new Blob([lastHtml], {type:"text/html;charset=utf-8"}));
+  window.open(url, "_blank");
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+};
+
+document.getElementById("btnDownload").onclick = ()=>{
+  if(!lastHtml || !current) return;
+  const url = URL.createObjectURL(new Blob([lastHtml], {type:"text/html;charset=utf-8"}));
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = current.replace(/\.html$/, "") + ".preview.html";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url), 5000);
+};
+
+/* ---- 파일 목록 접기 ---- */
+const NAV_KEY = "rtbPreview.navClosed";
+
+function setNav(closed, save){
+  document.body.classList.toggle("nav-closed", closed);
+  document.getElementById("btnNav").setAttribute("aria-expanded", String(!closed));
+  if(save){ try{ localStorage.setItem(NAV_KEY, closed ? "1" : "0"); }catch(e){} }
+  /* 폭이 바뀌었으니 '자동 맞춤' 배율을 다시 계산한다 (transition 이 끝난 뒤) */
+  setTimeout(()=>applyZoom({w:+inW.value||300, h:+inH.value||250}), 200);
+}
+
+document.getElementById("btnNav").onclick = ()=>
+  setNav(!document.body.classList.contains("nav-closed"), true);
+
+/* 위/아래 방향키로 목록 이동 */
+document.addEventListener("keydown", e=>{
+  /* 입력 중일 때는 목록 이동으로 가로채지 않는다 (target 이 요소가 아닐 수도 있다) */
+  if(e.target instanceof Element && e.target.matches("input,textarea,select")) return;
+  if(e.key !== "ArrowDown" && e.key !== "ArrowUp") return;
+  const items = [...listEl.querySelectorAll(".item")];
+  const i = items.findIndex(el=>el.dataset.name === current);
+  const next = items[i + (e.key === "ArrowDown" ? 1 : -1)];
+  if(next){ e.preventDefault(); select(next.dataset.name); next.scrollIntoView({block:"nearest"}); }
+});
+
+/* ==========================================================================
+   10. 시작
+   ========================================================================== */
+renderList("");
+if(location.protocol === "file:") showLocalNotice();
+renderSettings();
+renderCatalogInfo();
+updateWriteState();
+try{ setNav(localStorage.getItem(NAV_KEY) === "1", false); }catch(e){}
+
+const fromHash = decodeURIComponent(location.hash.slice(1));
+select(FILES.includes(fromHash) ? fromHash : "openRtb300_250.html");
+</script>
+</body>
+</html>

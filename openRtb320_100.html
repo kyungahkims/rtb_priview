@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<title>mobon guide</title>
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/common/css/mobon_reset.css?201706292">
+	<style type="text/css">
+		#mobon_type01{position:relative;width:320px;height:100px;background-color:#fff;overflow:hidden;margin:0 auto;}
+		#mobon_type01 .shop-logo{width:60px;height:100%;float:left;margin:0 5px;}
+		#mobon_type01 .shop-logo p{width:100%;height:100%;background-size:contain;background-repeat:no-repeat;background-position:center center;}
+		#mobon_type01 .main_img_box{float:left;width:250px;height:100%;background-color:#e3e1e2;overflow:hidden;}
+		#mobon_type01 .main_img_box>li{position:relative;float:left;width:76px;height:90px;margin:5px 0 5px 5px;overflow:hidden;cursor:pointer;background-size:cover;background-repeat:no-repeat;background-position:center center;}
+		#mobon_type01 .main_img_box>li>.textBox{position:absolute;left:0;top:-135px;padding-top:35px;width:100%;height:100%;font-size:12px;letter-spacing:-0.5px;text-align:center;font-weight:bold;color:#000;background-color:#fff; opacity:.7;filter:Alpha(opacity=70);}
+		#mobon_type01 .main_img_box>li.on>.textBox{top:0;}
+	</style>
+</head>
+<body>
+	<div id="noHiddenMobon" class="mobon_reset">
+		<div id="mobon_type01">
+			<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<ul class="main_img_box">
+				<li class="item" style="background-image:url('{{img1}}');{{ImageSqre}}" onclick="window.open('{{purl1}}');">
+					<div class="textBox">
+						<p class="price">{{advrtsReplcNm}}<br/>{{price1}}</p>
+					</div>                  
+				</li>
+				<li class="item" style="background-image:url('{{img2}}');{{ImageSqre}}" onclick="window.open('{{purl2}}');">
+					<div class="textBox">
+						<p class="price">{{advrtsReplcNm}}<br/>{{price2}}</p>
+					</div>                  
+				</li>
+				<li class="item" style="background-image:url('{{img3}}');{{ImageSqre}}" onclick="window.open('{{purl3}}');">
+					<div class="textBox">
+						<p class="price">{{advrtsReplcNm}}<br/>{{price3}}</p>
+					</div>                  
+				</li>
+			</ul>
+			<div class="shop-logo"><p style="background-image: url('{{logo}}');"></p></div>
+		</div>
+	</div>
+	{{wp_imgtag}}
+	<div style="background: #f3f3f3; font-size: 0;display:none;" id="hiddenMobon">
+		<div id="mobon_banner" onclick="window.open('https://ref.ad-brix.com/v1/referrallink?ak=576324275&ck=1535237')">
+		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<img src="{{HTTP}}/servlet/image/otjalnam/320x100.jpg" />
+		</div>
+	</div>
+	<img src="{{img1}}" onError="imgFail('{{pcode1}}');" style='display: none;' />
+	<img src="{{img2}}" onError="imgFail('{{pcode2}}');" style='display: none;' />
+	<img src="{{img3}}" onError="imgFail('{{pcode3}}');" style='display: none;' />
+</body>
+<script type="text/javascript" src="{{HTTP}}/Frtb/common/script/jquery.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+		function init(){
+			time = 3000
+			timer = setInterval(autoTimer,time);
+			cur = 0;
+			total = $('.item').length;
+			ImgRolling(cur);
+		}
+		function ImgRolling(_n){
+			$('.item').each(function(){
+				if($(this).index() == _n){
+					$('.item').removeClass('on');
+					$(this).addClass('on');
+				}
+			});
+		}
+		function autoTimer(){
+			cur = (cur >= total-1)?0:cur = cur+1;
+			ImgRolling(cur);
+		}
+		init();
+	});
+	
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
+</html>

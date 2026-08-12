@@ -1,0 +1,79 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<title>mobon guide</title>
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/common/css/mobon_reset.css?201706292">
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/frame/MY01E06C01M021/style.css">
+	<style type="text/css">
+		#mobonLogo{left:2px;}
+		.main_img_box{float:left;}
+		.main_img_box .size{width:200px;height:200px;background-size:cover;background-repeat:no-repeat;background-position:center center;}
+		.text-box {width:116px;height:100%;overflow:hidden;padding:6px 6px 0;float:left;}
+		.text-box > .name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-bottom:3px;}
+		.text-box > .price{color:#FF004D!important;font-size:13px;font-weight:600;}
+		.text-box > .saleBox > span{position:absolute; bottom:5px;}
+		.text-box > .saleBox > .price{color:#6E6E6E!important;text-decoration:line-through;font-size:12px;font-weight:500;}
+		.text-box > .saleBox > .price2{color:#FF004D;font-size:13px;font-weight:600;opacity:0;}
+		.no-display{display:none;}
+	</style>
+</head>
+<body>
+	<div id="noHiddenMobon" class="mobon_reset">
+		<div id="mobon_type01" onclick="window.open('{{purl1}}');">
+			<div id="mobonLogo" onclick="window.open('http://img.mobon.net/ad/linfo.php')"></div>
+			<div class="main_img_box">
+				<div class="size" style="background-image:url('{{img1}}');{{ImageSqre}}"></div>
+			</div>
+			<div class="text-box">
+				<div class="name">{{pnm1}}</div>
+				<div class="{{box1}}">
+					<span class="price">{{price1}}</span>
+					<span class="price2">{{price2_1}}</span>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{wp_imgtag}}
+	<div style="background: #f3f3f3; font-size: 0;display:none;" id="hiddenMobon">
+		<div id="mobon_banner" onclick="window.open('https://ref.ad-brix.com/v1/referrallink?ak=576324275&ck=1535237')">
+		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<img src="{{HTTP}}/servlet/image/otjalnam/320x50.jpg" />
+		</div>
+	</div>
+	<img src="{{img1}}" onError="imgFail('{{pcode1}}');" style='display: none;' />
+</body>
+<script type="text/javascript" src="{{HTTP}}/Frtb/common/script/jquery.js"></script>
+<script type="text/javascript">
+	$(window).load(function(){
+		setTimeout(function(){
+			var scan  = $(".size").height() - $(".main_img_box").height();
+			function animateImg01(){
+				$('.size').animate({top:-scan}, 2000).animate({top:"0px"}, 3000, animateImg01);
+			}
+			animateImg01();
+		}, 1500);
+		var time={ duration: 1000 };
+		var time2={ duration: 1500 };
+		$(function() {
+			function loop(){
+				$('.saleBox > .price').animate({opacity: "1"},time).animate({opacity: "0"}).animate({opacity: "0"},time2).animate({opacity: "1"},500,loop);
+				$('.saleBox > .price2').animate({opacity: "0"},time).animate({opacity: "1"}).animate({opacity: "1"},time2).animate({opacity: "0"},500,loop);           
+			}
+			loop();
+		});
+	});
+	
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
+</html>

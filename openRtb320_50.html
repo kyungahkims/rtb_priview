@@ -1,0 +1,63 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, maximum-scale=1">
+	<title>mobon guide</title>
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/common/css/mobon_reset.css?201706292">
+	<link rel="stylesheet" type="text/css" href="{{HTTP}}/Frtb/frame/MY01E06C01M021/style.css">
+	<style type="text/css">
+		#mobonLogo{left:2px;}
+		.main_img_box{float:left;width:160px !important;}
+		.main_img_box .size{width:160px;height:160px;background-size:cover;background-repeat:no-repeat;background-position:center center;}
+		.textBox {width:156px;height:100%;overflow:hidden;padding:6px 6px 0;float:left;}
+		.textBox > .name{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-bottom:3px;}
+		.textBox > .price{color:#FF004D!important;font-size:12px;font-weight:600;}
+	</style>
+</head>
+<body>
+	<div id="noHiddenMobon" class="mobon_reset">
+		<div id="mobon_type01" onclick="window.open('{{purl1}}');">
+			<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<div class="main_img_box">
+				<div class="size" style="background-image:url('{{img1}}');{{ImageSqre}}"></div>
+			</div>
+			<div class="textBox">
+				<div class="name">{{pnm1}}</div>
+				<div class="price">{{advrtsReplcNm}}&nbsp;{{price1}}</div>
+			</div>
+		</div>
+	</div>
+	{{wp_imgtag}}
+	<div style="background: #f3f3f3; font-size: 0;display:none;" id="hiddenMobon">
+		<div id="mobon_banner" onclick="window.open('https://ref.ad-brix.com/v1/referrallink?ak=576324275&ck=1535237')">
+		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+			<img src="{{HTTP}}/servlet/image/otjalnam/320x50.jpg" />
+		</div>
+	</div>
+	<img src="{{img1}}" onError="imgFail('{{pcode1}}');" style='display: none;' />
+</body>
+<script type="text/javascript" src="{{HTTP}}/Frtb/common/script/jquery.js"></script>
+<script type="text/javascript">
+	$(window).load(function(){
+		setTimeout(function(){
+			var scan  = $(".size").height() - $(".main_img_box").height();
+			function animateImg01(){
+				$('.size').animate({top:-scan}, 2000).animate({top:"0px"}, 3000, animateImg01);
+			}
+			animateImg01();
+		}, 1500);
+	});
+	
+	var uuid = "{{UUID}}";
+	var u = "{{USER}}";
+	var itlTpCode = "{{ITL_TP_CODE}}";
+	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("hiddenMobon").style.display = '';
+		document.getElementById("noHiddenMobon").outerHTML = "";
+		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
+	}
+</script>
+</html>
