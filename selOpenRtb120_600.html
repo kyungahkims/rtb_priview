@@ -36,6 +36,7 @@
 	</style>
 </head>
 <body>
+	<div id="noHiddenMobon">
 	<div id="mobon_reset">
 		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
 		<div class="shop_logo0" style='background-image:url("{{logo}}")'></div>
@@ -184,6 +185,7 @@
 			</div>
 		</div>
 	</div>
+	</div>
 	{{wp_imgtag}}
 	<div style="background: #f3f3f3; font-size: 0;display:none;" id="hiddenMobon">
 		<div id="mobon_banner" onclick="window.open('https://mobon.net/bridge/')">
@@ -260,6 +262,8 @@
 	var u = "{{USER}}";
 	var itlTpCode = "{{ITL_TP_CODE}}";
 	function imgFail(pcode) {
+		document.getElementById("noHiddenMobon").innerHTML = "";
+		document.getElementById("noHiddenMobon").outerHTML = "";
 		document.getElementById("hiddenMobon").style.display = '';
 		(new Image()).src = document.protocols = '{{HTTP_DR}}/rtbShop?uid=' + encodeURI(uuid) + '&u=' + u + '&pc=' + pcode + '&itlTpCode=' + itlTpCode;
 	}
