@@ -393,13 +393,17 @@ const FILES = [
   "selOpenRtb120_600.html","selOpenRtb160_600.html","selOpenRtb200_200.html",
   "selOpenRtb250_250.html","selOpenRtb300_250.html","selOpenRtb300_250_with_light_effect.html",
   "selOpenRtb300_600.html","selOpenRtb320_100.html","selOpenRtb320_50.html",
-  "selOpenRtb728_90.html","selOpenRtb970_250.html","160x600_dev.html"
+  "selOpenRtb728_90.html","selOpenRtb970_250.html",
+  "120x600_dev.html", "160x600_dev.html", "200x200_dev.html", "234x60_dev.html",
+  "250x250_dev.html", "300x100_dev.html", "300x250_dev.html", "300x50_dev.html",
+  "300x600_dev.html", "320x100_dev.html", "320x50_dev.html", "336x280_dev.html",
+  "728x90_dev.html", "970x250_dev.html", "none_auto_dev.html"
 ];
 
 /* 세 분류는 서로 겹치지 않도록 조건을 명시해 둔다 (순서를 바꿔도 안전) */
 const isBanner = n => /Banner/i.test(n);
 const isSel    = n => n.startsWith("selOpenRtb");
-const isBg     = n => n === "160x600_dev.html";
+const isBg     = n => n.endsWith("_dev.html");
 
 const GROUPS = [
   {key:"banner",  label:"비상품",              en:"openRtbBanner", test:isBanner},
