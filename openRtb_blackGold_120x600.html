@@ -12,7 +12,7 @@
 
 	/* 2. 배너 & 이미지 규격 */
 	:root {
-		--width: 300px;
+		--width: 120px;
 		--height: 600px;
 	}
 
@@ -23,7 +23,6 @@
 		box-sizing: border-box;
 	}
 
-	#mobonLogo,
 	.mobonLogo {
 		position: absolute;
 		top: 2px;
@@ -37,7 +36,6 @@
 		cursor: pointer;
 	}
 
-	#mobonLogo:hover,
 	.mobonLogo:hover {
 		width: 73px;
 		height: 15px;
@@ -60,9 +58,9 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		height: 70px;
+		height: 30px;
 		background-color: #fff;
-		padding: 10px 16px;
+		padding: 5px 16px;
 		cursor: pointer;
 	}
 
@@ -72,19 +70,19 @@
 	}
 
 	.mobon_banner_wrap {
-		display: grid;
-		flex-grow: 1;
-		grid-template-columns: repeat(2, minmax(0, 1fr));
-		grid-template-rows: repeat(2, 1fr);
-		gap: 24px 12px;
-		padding: 24px 10px;
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		gap: 12px 10px;
 		background-color: #121214;
+		padding: 16px 10px;
 	}
 
 	.mobon_banner {
 		position: relative;
 		display: flex;
 		flex-direction: column;
+		flex: 1;
 		cursor: pointer;
 	}
 
@@ -106,13 +104,13 @@
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
-		row-gap: 6px;
-		margin-top: 8px;
+		row-gap: 3px;
+		margin-top: 5px;
 	}
 
 	.pnm {
 		min-width: 0;
-		font-size: 12px;
+		font-size: 11px;
 		font-weight: 500;
 		letter-spacing: -0.24px;
 		color: #d8d4cd;
@@ -132,11 +130,11 @@
 	}
 
 	.sale .original_price {
-		font-size: 11px;
+		font-size: 9px;
 		font-weight: 500;
 		color: #7d7871;
 		text-decoration: line-through;
-		margin-top: 2px;
+		margin-top: 1px;
 	}
 
 	.sale_rate {
@@ -144,7 +142,7 @@
 		position: absolute;
 		top: 0;
 		right: 0;
-		font-size: 11px;
+		font-size: 10px;
 		font-weight: bold;
 		letter-spacing: -0.5px;
 		color: #121214;
@@ -160,14 +158,14 @@
 
 	.sale_price {
 		display: none;
-		font-size: 15px;
+		font-size: 12px;
 		letter-spacing: -0.6px;
 		font-weight: bold;
 		color: #ffffff;
 	}
 
 	.original_price {
-		font-size: 15px;
+		font-size: 12px;
 		letter-spacing: -0.6px;
 		font-weight: bold;
 		color: #ffffff;
@@ -177,9 +175,9 @@
 	.shop_btn {
 		position: relative;
 		width: 100%;
-		height: 28px;
+		height: 21px;
 		font-family: inherit;
-		font-size: 11px;
+		font-size: 10px;
 		font-weight: 500;
 		color: #f0e2b8;
 		border: 1px solid #e8c66a;
@@ -215,32 +213,32 @@
 		}
 	}
 
-		/* 5. 대체 배너 */
-		.fallback_banner {
-			display: none;
-			position: relative;
-			width: var(--width);
-			height: var(--height);
-			overflow: hidden;
-		}
+	/* 5. 대체 배너 */
+	.fallback_banner {
+		display: none;
+		position: relative;
+		width: var(--width);
+		height: var(--height);
+		overflow: hidden;
+	}
 
-		.fallback_link {
-			display: block;
-			width: 100%;
-			height: 100%;
-			cursor: pointer;
-		}
+	.fallback_link {
+		display: block;
+		width: 100%;
+		height: 100%;
+		cursor: pointer;
+	}
 
-		.fallback_banner img {
-			width: 100%;
-			height: 100%;
-			object-fit: cover;
-		}
-	</style>
+	.fallback_banner img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+</style>
 
 <body>
 	<div class="mobon_reset" id="noHiddenMobon">
-		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+		<div class="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
 		<div class="shop_logo" onclick="window.open('{{purl1}}')">
 			<img src="{{logo}}" alt="로고" onerror="this.onerror=null; this.src='{{HTTP}}/rtb/images/mobon.jpg'">
 		</div>
@@ -297,23 +295,6 @@
 				</div>
 			</div>
 
-			<!-- mobon_banner 4 -->
-			<div class="mobon_banner" onclick="window.open('{{purl4}}')">
-				<div class="img_wrap">
-					<img class="img" src="{{img4}}" data-pcode="{{pcode4}}" alt="{{pnm4}}">
-				</div>
-				<div class="info_wrap">
-					<p class="pnm">{{pnm4}}</p>
-					<!-- 할인 상품인 경우 .price_box에 .sale 추가 -->
-					<div class="price_box {{box4}} sale">
-						<div class="sale_rate">{{discount4}}<span>%</span></div>
-						<div class="sale_price">{{price2_4}}</div>
-						<div class="original_price">{{price4}}</div>
-					</div>
-					<button type="button" class="shop_btn">최저가 구매</button>
-				</div>
-			</div>
-
 		</div>
 	</div>
 	<!-- 노출 추적 태그 -->
@@ -323,7 +304,7 @@
 	<div class="fallback_banner" id="hiddenMobon">
 		<div class="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
 		<div class="fallback_link" onclick="window.open('https://mobon.net/bridge/')">
-			<img src="{{HTTP}}/servlet/image/mobon/300x600.png" alt="대체배너" />
+			<img src="{{HTTP}}/servlet/image/mobon/120x600.png" alt="대체배너" />
 		</div>
 	</div>
 

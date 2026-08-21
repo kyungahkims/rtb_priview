@@ -22,7 +22,6 @@
 			box-sizing: border-box;
 		}
 
-		#mobonLogo,
 		.mobonLogo {
 			position: absolute;
 			top: 2px;
@@ -36,7 +35,6 @@
 			cursor: pointer;
 		}
 
-		#mobonLogo:hover,
 		.mobonLogo:hover {
 			width: 73px;
 			height: 15px;
@@ -213,7 +211,7 @@
 				left: 100%;
 			}
 		}
-	
+
 		/* 5. 대체 배너 */
 		.fallback_banner {
 			display: none;
@@ -240,7 +238,7 @@
 
 <body>
 	<div class="mobon_reset" id="noHiddenMobon">
-		<div id="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
+		<div class="mobonLogo" onclick="window.open('{{HTTP}}/ad/linfo.php')"></div>
 		<div class="shop_logo" onclick="window.open('{{purl1}}')">
 			<img src="{{logo}}" alt="로고" onerror="this.onerror=null; this.src='{{HTTP}}/rtb/images/mobon.jpg'">
 		</div>
