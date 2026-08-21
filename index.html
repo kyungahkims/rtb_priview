@@ -401,15 +401,17 @@ const FILES = [
 ];
 
 /* 세 분류는 서로 겹치지 않도록 조건을 명시해 둔다 (순서를 바꿔도 안전) */
-const isBanner = n => /Banner/i.test(n);
-const isSel    = n => n.startsWith("selOpenRtb");
-const isBg     = n => n.startsWith("openRtb_blackGold");
+const isBanner    = n => /Banner/i.test(n);
+const isSel       = n => n.startsWith("selOpenRtb");
+const isBg        = n => n.startsWith("openRtb_blackGold") && n !== "openRtb_blackGold_non_Item_auto.html";
+const isNewBanner = n => n === "openRtb_blackGold_non_Item_auto.html";
 
 const GROUPS = [
   {key:"banner",  label:"비상품",              en:"openRtbBanner", test:isBanner},
-  {key:"openrtb", label:"상품",                en:"openRtb",       test:n=>!isBanner(n) && !isSel(n) && !isBg(n)},
+  {key:"openrtb", label:"상품",                en:"openRtb",       test:n=>!isBanner(n) && !isSel(n) && !isBg(n) && !isNewBanner(n)},
   {key:"sel",     label:"상품 세일",           en:"selOpenRtb",    test:isSel},
-  {key:"bg",      label:"블랙&골드 상품형 배너", en:"blackGold",      test:isBg}
+  {key:"bg",      label:"블랙&골드 상품형 배너", en:"blackGold",      test:isBg},
+  {key:"newbg",   label:"new 비상품",          en:"newBanner",     test:isNewBanner}
 ];
 
 /* 파일명에서 가로_세로 추출 (없으면 null) */
